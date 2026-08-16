@@ -1,0 +1,37 @@
+{
+  "team_id": "REPLACE_WITH_YOUR_ADTF_TEAM_ID",
+  "domain": "agriculture",
+  "language_scope": ["en", "sw"],
+  "african_alpha_claim": true,
+  "budget_laptop_claim": true,
+  "submitter": {
+    "name": "Lemashon Ntutu",
+    "email": "lemashonpeter1@gmail.com",
+    "github_handle": "MASHON01"
+  },
+  "cross_disciplinary_pairing": {
+    "discipline": "computer_vision",
+    "load_bearing": true,
+    "description": "A MobileNetV3-small image model runs on the CPU through ONNX to classify a photo of a crop leaf. The predicted crop and disease are added to the retrieval query and the prompt, so the language model's advice comes from the matching KALRO and Infonet reference text instead of from the model's own memory. A photo of a diseased maize leaf pulls the relevant maize guidance and returns an answer with its sources shown."
+  },
+  "test_prompts": [
+    {
+      "prompt_id": "tp_001",
+      "prompt": "My maize leaves have long grey-brown rectangular lesions running along the veins, and the lower leaves are drying first. What disease is this likely to be, and how should a smallholder farmer in Kenya manage it without expensive inputs?"
+    },
+    {
+      "prompt_id": "tp_002",
+      "prompt": "I grow beans in Nakuru County and my plants have orange-brown rust pustules on the leaves. What is the recommended plant spacing for beans, and how can I reduce bean rust using practices available to a smallholder farmer?"
+    }
+  ],
+  "model": {
+    "name": "Llama-3.2-1B-Instruct-Q4_K_M",
+    "runtime": "llama.cpp",
+    "quantization": "GGUF Q4_K_M",
+    "parameters_estimate": "1.2B",
+    "packaging": "binary_bundle"
+  },
+  "_runtime": {
+    "model_path": "models/Llama-3.2-1B-Instruct-Q4_K_M.gguf"
+  }
+}

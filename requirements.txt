@@ -1,0 +1,89 @@
+##################################################
+# CORE API
+##################################################
+
+fastapi>=0.116.1
+uvicorn[standard]>=0.35.0
+
+##################################################
+# CONFIGURATION
+##################################################
+
+pydantic>=2.11.7
+pydantic-settings>=2.10.1
+python-dotenv>=1.1.1
+
+##################################################
+# LOGGING
+##################################################
+
+structlog>=25.4.0
+rich>=14.1.0
+
+##################################################
+# UTILITIES
+##################################################
+
+numpy>=2.3.2
+httpx>=0.28.1
+# The llama-server HTTP client (app/orchestration/llm/) talks over `requests`.
+requests>=2.32.0
+orjson>=3.11.2
+python-multipart>=0.0.20
+typing-extensions>=4.15.0
+
+##################################################
+# RAG
+##################################################
+
+faiss-cpu>=1.12.0
+sentence-transformers>=5.1.0
+torch>=2.8.0
+
+##################################################
+# DOCUMENTS
+##################################################
+
+pymupdf>=1.26.4
+python-docx>=1.2.0
+pandas>=2.3.1
+
+##################################################
+# LANGUAGE
+##################################################
+
+lingua-language-detector>=2.1.1
+
+##################################################
+# IMAGE CLASSIFIER
+##################################################
+
+onnxruntime>=1.22.1
+opencv-python>=4.12.0.88
+Pillow>=11.3.0
+
+##################################################
+# LLM
+##################################################
+
+# Inference runs via a separate llama.cpp `llama-server` process, which
+# the app talks to over HTTP (see app/orchestration/llm/llama_client.py).
+# The `llama-cpp-python` bindings are NOT used and are intentionally not a
+# dependency - build llama.cpp itself instead (make build-llama).
+
+##################################################
+# TESTING
+##################################################
+
+pytest>=8.4.1
+pytest-asyncio>=1.1.0
+pytest-cov>=6.2.1
+
+##################################################
+# CODE QUALITY
+##################################################
+
+black>=25.1.0
+ruff>=0.12.8
+mypy>=1.17.1
+pre-commit>=4.3.0

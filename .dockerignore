@@ -1,0 +1,52 @@
+# Keep the build context (and image) lean: exclude everything the
+# backend image doesn't need. Mirrors .gitignore for the heavy stuff,
+# plus build/test cruft that shouldn't ship in an image.
+
+# The LLM engine + weights are never in the image (option B).
+llama.cpp/
+models/*.gguf
+models/*.onnx
+models/*.bin
+models/*.pt
+models/*.pth
+
+# Data + generated artifacts.
+data/
+logs/
+benchmarks/results/
+benchmarks/reports/
+
+# Python / tooling caches.
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Envs + secrets.
+.venv/
+venv/
+env/
+.env
+*.pem
+*.key
+*.crt
+
+# VCS + IDE + OS.
+.git/
+.github/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Docs + tests aren't needed at runtime (keep the image minimal).
+docs/
+backend/tests/
+
+# Build outputs.
+build/
+dist/
+*.egg-info/

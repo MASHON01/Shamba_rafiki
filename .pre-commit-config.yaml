@@ -1,0 +1,50 @@
+# Pre-commit hooks: run the same lint/format/type checks locally that CI
+# runs, so problems are caught before they reach a commit.
+#   install once:  pre-commit install
+#   run manually:  pre-commit run --all-files
+#
+# Versions are pinned so every contributor (and CI) gets identical
+# behaviour; bump them deliberately, not accidentally.
+
+default_language_version:
+  python: python3.12
+
+repos:
+  # --- basic hygiene -----------------------------------------------------
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-toml
+      - id: check-added-large-files
+        args: ["--maxkb=1024"]        # block accidental model/binary commits
+      - id: check-merge-conflict
+      - id: mixed-line-ending
+        args: ["--fix=lf"]            # normalize CRLF -> LF
+
+  # --- formatting --------------------------------------------------------
+  - repo: https://github.com/psf/black
+    rev: 25.1.0
+    hooks:
+      - id: black
+        args: ["--line-length=100"]
+
+  # --- lint (with autofix) ----------------------------------------------
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.12.8
+    hooks:
+      - id: ruff
+        args: ["--fix"]
+
+  # --- type checking -----------------------------------------------------
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.17.1
+    hooks:
+      - id: mypy
+        # Only type-check the application package, not tests/scripts.
+        files: ^backend/app/
+        additional_dependencies:
+          - pydantic>=2.11
+          - types-requests

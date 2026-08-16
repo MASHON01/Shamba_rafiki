@@ -1,0 +1,172 @@
+[project]
+name = "shamba-rafiki-backend"
+version = "0.1.0"
+description = "Offline AI agricultural advisory assistant for smallholder farmers."
+authors = [
+    { name = "Shamba Rafiki Team" }
+]
+readme = "README.md"
+requires-python = ">=3.12"
+
+dependencies = [
+    "fastapi>=0.116.1",
+    "uvicorn[standard]>=0.35.0",
+
+    "pydantic>=2.11.7",
+    "pydantic-settings>=2.10.1",
+
+    "python-dotenv>=1.1.1",
+
+    "structlog>=25.4.0",
+    "rich>=14.1.0",
+
+    "numpy>=2.3.2",
+
+    "httpx>=0.28.1",
+
+    "requests>=2.32.0",
+
+    "orjson>=3.11.2",
+
+    "python-multipart>=0.0.20",
+
+    "typing-extensions>=4.15.0"
+]
+
+[project.optional-dependencies]
+
+rag = [
+    "faiss-cpu>=1.12.0",
+    "sentence-transformers>=5.1.0",
+    "torch>=2.8.0"
+]
+
+vision = [
+    "onnxruntime>=1.22.1",
+    "opencv-python>=4.12.0.88",
+    "Pillow>=11.3.0"
+]
+
+documents = [
+    "pymupdf>=1.26.4",
+    "python-docx>=1.2.0",
+    "pandas>=2.3.1"
+]
+
+language = [
+    "lingua-language-detector>=2.1.1"
+]
+
+# Inference is via a separate llama.cpp `llama-server` process over HTTP;
+# the `llama-cpp-python` bindings are not used, so there is no `llm` extra.
+
+dev = [
+    "pytest>=8.4.1",
+    "pytest-asyncio>=1.1.0",
+    "pytest-cov>=6.2.1",
+
+    "ruff>=0.12.8",
+
+    "black>=25.1.0",
+
+    "mypy>=1.17.1",
+
+    "pre-commit>=4.3.0"
+]
+
+[tool.black]
+
+line-length = 100
+target-version = ["py312"]
+
+[tool.ruff]
+
+line-length = 100
+
+target-version = "py312"
+
+exclude = [
+    ".venv",
+    "build",
+    "dist",
+    "__pycache__"
+]
+
+[tool.ruff.lint]
+
+select = [
+    "E",
+    "F",
+    "I",
+    "UP",
+    "B",
+    "SIM"
+]
+
+ignore = [
+    "E501",   # line length is handled by black, not ruff
+    "B008",   # FastAPI uses Depends()/File() in arg defaults by design
+    "UP040",  # allow explicit TypeAlias (clearer than the `type` statement here)
+    "UP047",  # allow explicit TypeVar over PEP 695 generics (same style choice as UP040)
+    "B905",   # zip() strict= not required for our short, equal-length zips
+]
+
+# Tests and one-off scripts are held to a lighter standard than the
+# shipped application code: readability quirks that are fine in a test
+# (multiple statements on a line, quoted annotations, duplicate literals
+# in a set fixture) shouldn't fail the linter.
+[tool.ruff.lint.per-file-ignores]
+"backend/tests/**" = ["E702", "B033", "UP037", "F841", "SIM105", "UP045"]
+"backend/scripts/**" = ["E702", "UP037"]
+"backend/app/**" = ["UP035", "UP037", "UP042", "UP017", "UP006"]
+
+[tool.pytest.ini_options]
+# Single source of truth for pytest (tests/pytest.ini removed).
+# Runs from the repo root: add backend/ to the path so `import app` works,
+# and point discovery at backend/tests.
+pythonpath = ["backend"]
+testpaths = ["backend/tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+asyncio_mode = "auto"
+addopts = "-q --strict-markers --tb=short"
+markers = [
+    "unit: fast, isolated component tests (no model, no server)",
+    "integration: cross-component flows (ingest->index->retrieve, orchestrator)",
+    "api: endpoint tests via FastAPI TestClient",
+    "slow: tests that build a corpus/index (still fast, but heavier)",
+]
+filterwarnings = ["ignore::DeprecationWarning"]
+
+[tool.mypy]
+
+python_version = "3.12"
+
+warn_return_any = true
+
+warn_unused_configs = true
+
+disallow_untyped_defs = true
+
+ignore_missing_imports = true
+
+# The importable package is `app`, and it lives under backend/ (not the
+# repo root, which also holds data/, models/, logs/, etc.). Tell setuptools
+# exactly that, so `pip install -e .` doesn't try to treat every top-level
+# folder as a package and bail on the flat layout.
+[tool.setuptools]
+package-dir = {"" = "backend"}
+
+[tool.setuptools.packages.find]
+where = ["backend"]
+include = ["app*"]
+
+[build-system]
+
+requires = [
+    "setuptools>=75",
+    "wheel"
+]
+
+build-backend = "setuptools.build_meta"

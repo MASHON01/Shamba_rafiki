@@ -1,0 +1,363 @@
+/*
+  Shamba Rafiki kiosk UI (Phase 4).
+  Deliberately dependency-free (no framework, no web fonts) so the page
+  loads instantly and fully offline on the 8 GB kiosk. Large touch
+  targets and high contrast for a shared, possibly-outdoor screen.
+*/
+
+:root {
+  --green-900: #14532d;
+  --green-700: #15803d;
+  --green-600: #16a34a;
+  --green-50: #f0fdf4;
+  --amber-500: #d97706;
+  --red-600: #dc2626;
+  --ink: #1f2937;
+  --muted: #6b7280;
+  --line: #e5e7eb;
+  --card: #ffffff;
+  --bg: #f6f7f4;
+  --radius: 14px;
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: var(--ink);
+  background: var(--bg);
+  line-height: 1.5;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* ---- Top bar ---- */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 20px;
+  background: var(--green-700);
+  color: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.brand .leaf {
+  font-size: 30px;
+  line-height: 1;
+}
+
+.topbar h1 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+
+.tagline {
+  margin: 0;
+  font-size: 13px;
+  opacity: 0.9;
+}
+
+.lang-toggle {
+  display: inline-flex;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 999px;
+  padding: 3px;
+}
+
+.lang-btn {
+  border: 0;
+  background: transparent;
+  color: #fff;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.lang-btn.is-active {
+  background: #fff;
+  color: var(--green-700);
+}
+
+/* ---- Layout ---- */
+.wrap {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 20px 16px 48px;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 18px;
+  margin-bottom: 16px;
+}
+
+.field-label {
+  display: block;
+  font-weight: 700;
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.question-input {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 14px;
+  font-size: 17px;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 84px;
+}
+
+.question-input:focus {
+  outline: 2px solid var(--green-600);
+  border-color: var(--green-600);
+}
+
+/* ---- Photo ---- */
+.photo-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 12px 0 4px;
+  flex-wrap: wrap;
+}
+
+.photo-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1.5px dashed var(--green-600);
+  color: var(--green-700);
+  background: var(--green-50);
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.photo-preview {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.photo-preview img {
+  width: 52px;
+  height: 52px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+}
+
+.photo-clear {
+  border: 0;
+  background: transparent;
+  color: var(--red-600);
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+/* ---- Ask button ---- */
+.ask-btn {
+  margin-top: 14px;
+  width: 100%;
+  border: 0;
+  background: var(--green-600);
+  color: #fff;
+  font-size: 18px;
+  font-weight: 700;
+  padding: 15px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.ask-btn:hover {
+  background: var(--green-700);
+}
+
+.ask-btn:disabled {
+  background: #9ca3af;
+  cursor: progress;
+}
+
+/* ---- Status ---- */
+.status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 18px;
+  margin-bottom: 16px;
+  border-radius: var(--radius);
+  background: #fff;
+  border: 1px solid var(--line);
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.status.is-error {
+  border-color: #fecaca;
+  background: #fef2f2;
+  color: var(--red-600);
+}
+
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 3px solid var(--line);
+  border-top-color: var(--green-600);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ---- Answer ---- */
+.answer-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.answer-head h2 {
+  margin: 0;
+  font-size: 19px;
+  color: var(--green-900);
+}
+
+.answer-text {
+  font-size: 17px;
+  white-space: pre-wrap;
+  margin: 8px 0 0;
+}
+
+.badge {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  color: #fff;
+  background: var(--muted);
+}
+
+.badge.is-high {
+  background: var(--green-600);
+}
+.badge.is-medium {
+  background: var(--amber-500);
+}
+.badge.is-low {
+  background: var(--red-600);
+}
+
+/* ---- Classification ---- */
+.classification {
+  background: var(--green-50);
+  border: 1px solid #bbf7d0;
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+  font-size: 15px;
+}
+
+.classification .dx {
+  font-weight: 700;
+  color: var(--green-900);
+}
+
+.classification .alts {
+  color: var(--muted);
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+/* ---- Sources ---- */
+.sources {
+  margin-top: 16px;
+  border-top: 1px solid var(--line);
+  padding-top: 12px;
+}
+
+.sources h3 {
+  margin: 0 0 8px;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: var(--muted);
+}
+
+.sources ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 6px;
+}
+
+.sources li {
+  font-size: 14px;
+  color: var(--ink);
+  background: #fafafa;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+
+.sources .score {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+/* ---- Disclaimer ---- */
+.disclaimer {
+  font-size: 13px;
+  color: var(--muted);
+  text-align: center;
+  margin: 8px auto 0;
+  max-width: 620px;
+}
+
+@media (max-width: 480px) {
+  .topbar h1 {
+    font-size: 19px;
+  }
+  .tagline {
+    display: none;
+  }
+}

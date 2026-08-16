@@ -1,0 +1,22 @@
+[
+  {
+    "crop": "maize",
+    "condition": "Common Rust",
+    "label": "Corn_(maize)___Common_rust_"
+  },
+  {
+    "crop": "maize",
+    "condition": "Northern Leaf Blight",
+    "label": "Corn_(maize)___Northern_Leaf_Blight"
+  },
+  {
+    "crop": "beans",
+    "condition": "Angular Leaf Spot",
+    "label": "Beans___Angular_leaf_spot"
+  },
+  {
+    "crop": "tomato",
+    "condition": "healthy",
+    "label": "Tomato___healthy"
+  }
+]

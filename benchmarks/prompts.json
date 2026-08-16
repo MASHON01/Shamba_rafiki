@@ -1,0 +1,14 @@
+[
+    {
+        "id": "english_diagnosis",
+        "prompt": "A maize farmer in Kiambu reports yellow streaks on leaves after several days of rain. Explain the most likely causes, how to distinguish between them, and recommend practical treatment steps."
+    },
+    {
+        "id": "swahili_diagnosis",
+        "prompt": "Mkulima anaona majani ya mahindi yana mistari ya njano baada ya mvua nyingi. Eleza tatizo linalowezekana na hatua za kuchukua."
+    },
+    {
+        "id": "economic_reasoning",
+        "prompt": "Treating a tomato disease will cost KES 800, but the expected increase in harvest value is only KES 500. Should the farmer treat the crop or replant? Explain your reasoning."
+    }
+]

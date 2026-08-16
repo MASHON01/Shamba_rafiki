@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Shamba Rafiki</title>
+    <meta
+      name="description"
+      content="Offline agricultural advice for smallholder farmers."
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <!--
+      Kiosk UI for Shamba Rafiki (Phase 4). A single static page served
+      offline by the FastAPI backend at /app. Text questions go to /chat;
+      a leaf photo (with optional text) goes to /classify. All UI strings
+      carry data-en / data-sw so the language toggle can switch them
+      without a reload; the toggle also sets the language sent to the API.
+      Behaviour lives in app.js.
+    -->
+    <header class="topbar">
+      <div class="brand">
+        <span class="leaf" aria-hidden="true">🌿</span>
+        <div>
+          <h1>Shamba Rafiki</h1>
+          <p class="tagline" data-en="Your farming friend" data-sw="Rafiki wako wa kilimo">
+            Your farming friend
+          </p>
+        </div>
+      </div>
+
+      <div class="lang-toggle" role="group" aria-label="Language">
+        <button type="button" class="lang-btn is-active" data-lang="en">English</button>
+        <button type="button" class="lang-btn" data-lang="sw">Kiswahili</button>
+      </div>
+    </header>
+
+    <main class="wrap">
+      <!-- Ask card -->
+      <section class="card ask-card">
+        <label
+          for="question"
+          class="field-label"
+          data-en="Ask about your crop"
+          data-sw="Uliza kuhusu zao lako"
+          >Ask about your crop</label
+        >
+        <textarea
+          id="question"
+          class="question-input"
+          rows="3"
+          data-ph-en="e.g. My maize has brown spots on the leaves. What should I do?"
+          data-ph-sw="mf. Mahindi yangu yana madoa ya kahawia kwenye majani. Nifanye nini?"
+          placeholder="e.g. My maize has brown spots on the leaves. What should I do?"
+        ></textarea>
+
+        <div class="photo-row">
+          <label class="photo-btn" for="photo">
+            <span aria-hidden="true">📷</span>
+            <span data-en="Add a leaf photo" data-sw="Ongeza picha ya jani">Add a leaf photo</span>
+          </label>
+          <input id="photo" type="file" accept="image/png,image/jpeg" hidden />
+          <div id="photo-preview" class="photo-preview" hidden>
+            <img id="photo-thumb" alt="Selected leaf photo" />
+            <button
+              type="button"
+              id="photo-clear"
+              class="photo-clear"
+              aria-label="Remove photo"
+              data-en="Remove"
+              data-sw="Ondoa"
+            >
+              Remove
+            </button>
+          </div>
+        </div>
+
+        <button id="ask" type="button" class="ask-btn" data-en="Ask" data-sw="Uliza">Ask</button>
+      </section>
+
+      <!-- Status / loading -->
+      <div id="status" class="status" hidden aria-live="polite"></div>
+
+      <!-- Answer card -->
+      <section id="answer-card" class="card answer-card" hidden>
+        <div class="answer-head">
+          <h2 data-en="Advice" data-sw="Ushauri">Advice</h2>
+          <span id="confidence" class="badge" hidden></span>
+        </div>
+
+        <!-- Classification summary (only for photo questions) -->
+        <div id="classification" class="classification" hidden></div>
+
+        <p id="answer" class="answer-text"></p>
+
+        <!-- Sources -->
+        <div id="sources-wrap" class="sources" hidden>
+          <h3 data-en="Based on" data-sw="Imetokana na">Based on</h3>
+          <ul id="sources"></ul>
+        </div>
+      </section>
+
+      <p
+        class="disclaimer"
+        data-en="Advice is general guidance from local agricultural references. For serious cases, consult your nearest agricultural extension officer."
+        data-sw="Ushauri ni mwongozo wa jumla kutoka vyanzo vya kilimo vya eneo lako. Kwa hali mbaya, wasiliana na afisa wa ugani wa kilimo aliye karibu."
+      >
+        Advice is general guidance from local agricultural references. For serious cases, consult
+        your nearest agricultural extension officer.
+      </p>
+    </main>
+
+    <script src="app.js" defer></script>
+  </body>
+</html>

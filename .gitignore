@@ -1,0 +1,157 @@
+#################################################
+# PYTHON
+#################################################
+
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+
+#################################################
+# VIRTUAL ENVIRONMENTS
+#################################################
+
+.venv/
+venv/
+env/
+
+#################################################
+# IDE
+#################################################
+
+.vscode/
+.idea/
+
+#################################################
+# PYTEST / COVERAGE
+#################################################
+
+.pytest_cache/
+.coverage
+htmlcov/
+
+#################################################
+# TYPE CHECKING / LINT CACHES
+#################################################
+
+.mypy_cache/
+.ruff_cache/
+
+#################################################
+# BUILD
+#################################################
+
+build/
+dist/
+*.egg-info/
+
+#################################################
+# LOGS
+#################################################
+
+logs/*
+!logs/.gitkeep
+*.log
+
+#################################################
+# ENVIRONMENT
+#################################################
+
+.env
+
+#################################################
+# MODELS  (weights are large + machine-specific: never commit)
+#################################################
+
+# Ignore everything under models/ (weights + trained ONNX + label sidecar +
+# any nested candidate dirs). The GGUF is fetched by download_model.sh; the
+# ONNX classifier is produced by the training notebook. Keep the dir itself.
+models/*
+!models/.gitkeep
+
+#################################################
+# llama.cpp  (built on the target machine by scripts/setup_local.sh;
+#             never commit the source tree or compiled binaries)
+#################################################
+
+llama.cpp/
+
+#################################################
+# DATA / RUNTIME ARTIFACTS
+# (dir names must match app/config/paths.py exactly)
+#################################################
+
+data/raw_documents/
+data/processed_documents/
+data/vector_store/
+data/embeddings/
+data/reports/
+data/faiss/
+data/cache/
+*.faiss
+*.index
+
+#################################################
+# GENERATED BENCHMARK OUTPUT  (harness code IS committed; results are not)
+#################################################
+
+benchmarks/results/
+benchmarks/reports/
+
+#################################################
+# NOTEBOOKS
+#################################################
+
+.ipynb_checkpoints/
+
+#################################################
+# OS FILES
+#################################################
+
+.DS_Store
+Thumbs.db
+
+#################################################
+# LOCAL DATABASES
+#################################################
+
+*.sqlite
+*.db
+
+#################################################
+# TEMP FILES
+#################################################
+
+*.tmp
+*.temp
+
+#################################################
+# SECRETS
+#################################################
+
+*.pem
+*.key
+*.crt
+
+#################################################
+# DOCKER
+#################################################
+
+docker-compose.override.yml
+
+#################################################
+# TRAINING ARTIFACTS (stretch Swahili fine-tune)
+# Scripts are committed; produced weights/datasets are not.
+#################################################
+
+training/data/
+training/adapters/
+training/merged/
+training/**/*.gguf
+training/**/*.safetensors
+training/**/*.bin
+# ADTC profiler outputs (regenerated locally / by the audit)
+submission*.json
+audit*.json
+verdict*.json

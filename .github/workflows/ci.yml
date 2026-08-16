@@ -1,0 +1,52 @@
+name: CI
+
+# Runs on every push and PR to main. Everything here works on the fake
+# embedder/LLM (from tests/conftest.py), so no model download and no
+# llama-server are needed - the whole suite runs in seconds.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality-and-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -e ".[dev]"
+
+      - name: Lint (ruff)
+        run: ruff check backend
+        continue-on-error: true   # advisory at first; a few known items
+                                  # remain (see NOTES). Flip to blocking
+                                  # once triaged.
+
+      - name: Format check (black)
+        run: black --check backend
+
+      - name: Type check (mypy)
+        run: mypy backend/app
+        continue-on-error: true   # advisory at first; flip to blocking once clean
+
+      - name: Run tests (all 98, on fakes)
+        run: pytest
