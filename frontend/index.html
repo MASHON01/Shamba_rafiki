@@ -1,116 +1,225 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>Shamba Rafiki</title>
-    <meta
-      name="description"
-      content="Offline agricultural advice for smallholder farmers."
-    />
-    <link rel="stylesheet" href="styles.css" />
-  </head>
-  <body>
-    <!--
-      Kiosk UI for Shamba Rafiki (Phase 4). A single static page served
-      offline by the FastAPI backend at /app. Text questions go to /chat;
-      a leaf photo (with optional text) goes to /classify. All UI strings
-      carry data-en / data-sw so the language toggle can switch them
-      without a reload; the toggle also sets the language sent to the API.
-      Behaviour lives in app.js.
-    -->
-    <header class="topbar">
-      <div class="brand">
-        <span class="leaf" aria-hidden="true">🌿</span>
-        <div>
-          <h1>Shamba Rafiki</h1>
-          <p class="tagline" data-en="Your farming friend" data-sw="Rafiki wako wa kilimo">
-            Your farming friend
-          </p>
-        </div>
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Farm Pal</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div class="app">
+  <aside class="side">
+    <div class="brand">
+      <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="#173404" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6"/></svg></div>
+      <div><b>Farm Pal</b><small>Shamba Rafiki</small></div>
+    </div>
+    <div class="nav-label" data-en="Workspace" data-sw="Eneo kazi">Workspace</div>
+    <nav class="nav" id="nav">
+      <a data-page="home" class="active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5 12 3l9 6.5V21H3z"/><path d="M9 21v-6h6v6"/></svg><span data-en="Home" data-sw="Nyumbani">Home</span></a>
+      <a data-page="ask"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span data-en="Ask" data-sw="Uliza">Ask</span></a>
+      <a data-page="diagnose"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span data-en="Diagnose" data-sw="Tambua">Diagnose</span></a>
+      <a data-page="farmers"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg><span data-en="Farmers" data-sw="Wakulima">Farmers</span></a>
+      <a data-page="history"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l4 2"/></svg><span data-en="Crop history" data-sw="Historia ya mazao">Crop history</span></a>
+      <a data-page="sources"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg><span data-en="Sources" data-sw="Marejeo">Sources</span></a>
+    </nav>
+    <div class="side-foot">
+      <div class="nav-label" data-en="System" data-sw="Mfumo">System</div>
+      <nav class="nav">
+        <a data-page="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span data-en="Settings" data-sw="Mipangilio">Settings</span></a>
+      </nav>
+      <div class="userchip"><div class="av">LN</div><div><b style="font-size:13px">Lemashon N.</b><small>Nakuru kiosk</small></div></div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div class="crumb">Farm Pal / <b id="crumb" data-en="Home" data-sw="Nyumbani">Home</b></div>
+      <div class="langtog">
+        <button class="lang-btn is-active" data-lang="en">EN</button>
+        <button class="lang-btn" data-lang="sw">SW</button>
       </div>
+      <button class="cta" data-go="ask"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg><span data-en="New question" data-sw="Swali jipya">New question</span></button>
+    </div>
 
-      <div class="lang-toggle" role="group" aria-label="Language">
-        <button type="button" class="lang-btn is-active" data-lang="en">English</button>
-        <button type="button" class="lang-btn" data-lang="sw">Kiswahili</button>
-      </div>
-    </header>
-
-    <main class="wrap">
-      <!-- Ask card -->
-      <section class="card ask-card">
-        <label
-          for="question"
-          class="field-label"
-          data-en="Ask about your crop"
-          data-sw="Uliza kuhusu zao lako"
-          >Ask about your crop</label
-        >
-        <textarea
-          id="question"
-          class="question-input"
-          rows="3"
-          data-ph-en="e.g. My maize has brown spots on the leaves. What should I do?"
-          data-ph-sw="mf. Mahindi yangu yana madoa ya kahawia kwenye majani. Nifanye nini?"
-          placeholder="e.g. My maize has brown spots on the leaves. What should I do?"
-        ></textarea>
-
-        <div class="photo-row">
-          <label class="photo-btn" for="photo">
-            <span aria-hidden="true">📷</span>
-            <span data-en="Add a leaf photo" data-sw="Ongeza picha ya jani">Add a leaf photo</span>
-          </label>
-          <input id="photo" type="file" accept="image/png,image/jpeg" hidden />
-          <div id="photo-preview" class="photo-preview" hidden>
-            <img id="photo-thumb" alt="Selected leaf photo" />
-            <button
-              type="button"
-              id="photo-clear"
-              class="photo-clear"
-              aria-label="Remove photo"
-              data-en="Remove"
-              data-sw="Ondoa"
-            >
-              Remove
-            </button>
+    <!-- HOME -->
+    <section class="page" data-p="home">
+      <p class="eyebrow" data-en="The offline farming advisor" data-sw="Mshauri wa kilimo asiye na mtandao">The offline farming advisor</p>
+      <div class="hero">
+        <div class="hero-card">
+          <h1 class="disp" data-en="Know sooner." data-sw="Jua mapema.">Know sooner.</h1>
+          <p class="sub" data-en="Ask in English or Kiswahili, or photograph a sick leaf. Farm Pal answers from real Kenyan sources, offline, and shows its work." data-sw="Uliza kwa Kiingereza au Kiswahili, au piga picha ya jani lenye ugonjwa. Farm Pal hujibu kutoka vyanzo halisi vya Kenya, bila mtandao.">Ask in English or Kiswahili, or photograph a sick leaf. Farm Pal answers from real Kenyan sources, offline, and shows its work.</p>
+          <div class="hero-actions">
+            <button class="btn" data-go="ask"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span data-en="Ask a question" data-sw="Uliza swali">Ask a question</span></button>
+            <button class="btn ghost" data-go="diagnose"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span data-en="Diagnose a leaf" data-sw="Tambua jani">Diagnose a leaf</span></button>
           </div>
         </div>
-
-        <button id="ask" type="button" class="ask-btn" data-en="Ask" data-sw="Uliza">Ask</button>
-      </section>
-
-      <!-- Status / loading -->
-      <div id="status" class="status" hidden aria-live="polite"></div>
-
-      <!-- Answer card -->
-      <section id="answer-card" class="card answer-card" hidden>
-        <div class="answer-head">
-          <h2 data-en="Advice" data-sw="Ushauri">Advice</h2>
-          <span id="confidence" class="badge" hidden></span>
+        <div class="hero-visual">
+          <div class="leaf-badge"><div class="k" data-en="Grounded run" data-sw="Jibu lenye vyanzo">Grounded run</div><div class="v"><span class="pass">100%</span> offline</div></div>
+          <div class="leafart">
+            <svg viewBox="0 0 120 120" fill="none"><path d="M60 108C30 96 18 70 24 44 34 8 78 20 100 8c6 24 8 52-10 74-12 15-20 20-30 26Z" fill="#8FB86A"/><path d="M60 104C46 74 40 44 60 16" stroke="#3B6D11" stroke-width="2.5" stroke-linecap="round"/><path d="M52 62c-8-3-14-9-18-16M66 46c8-4 13-10 16-18M56 82c-6-3-11-8-14-14" stroke="#3B6D11" stroke-width="2" stroke-linecap="round"/><circle cx="46" cy="70" r="4" fill="#C56A3E"/><circle cx="72" cy="52" r="3" fill="#C56A3E"/></svg>
+          </div>
+          <div style="font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft)">Maize · beans · offline</div>
         </div>
+      </div>
 
-        <!-- Classification summary (only for photo questions) -->
-        <div id="classification" class="classification" hidden></div>
+      <div class="stats" id="stats"></div>
 
-        <p id="answer" class="answer-text"></p>
-
-        <!-- Sources -->
-        <div id="sources-wrap" class="sources" hidden>
-          <h3 data-en="Based on" data-sw="Imetokana na">Based on</h3>
-          <ul id="sources"></ul>
+      <div class="grid2">
+        <div class="panelcard">
+          <h3 data-en="Recent activity" data-sw="Shughuli za hivi karibuni">Recent activity</h3>
+          <p class="meta" data-en="Diagnoses and advice given at this kiosk" data-sw="Utambuzi na ushauri uliotolewa hapa">Diagnoses and advice given at this kiosk</p>
+          <div class="feed" id="feed"></div>
         </div>
-      </section>
+        <div class="panelcard">
+          <h3 data-en="Needs attention" data-sw="Zinahitaji hatua">Needs attention</h3>
+          <p class="meta" data-en="Crops flagged with a disease" data-sw="Mazao yenye ugonjwa">Crops flagged with a disease</p>
+          <div class="feed" id="attn"></div>
+        </div>
+      </div>
+    </section>
 
-      <p
-        class="disclaimer"
-        data-en="Advice is general guidance from local agricultural references. For serious cases, consult your nearest agricultural extension officer."
-        data-sw="Ushauri ni mwongozo wa jumla kutoka vyanzo vya kilimo vya eneo lako. Kwa hali mbaya, wasiliana na afisa wa ugani wa kilimo aliye karibu."
-      >
-        Advice is general guidance from local agricultural references. For serious cases, consult
-        your nearest agricultural extension officer.
-      </p>
-    </main>
+    <!-- ASK -->
+    <section class="page" data-p="ask" hidden>
+      <p class="eyebrow" data-en="Ask Farm Pal" data-sw="Uliza Farm Pal">Ask Farm Pal</p>
+      <h1 class="disp" data-en="What's troubling your crop?" data-sw="Ni nini kinachosumbua zao lako?">What's troubling your crop?</h1>
+      <p class="sub" data-en="Type a question. Every answer is drawn from local reference material and cites its sources." data-sw="Andika swali. Kila jibu hutoka kwenye marejeo ya eneo na huonyesha vyanzo vyake.">Type a question. Every answer is drawn from local reference material and cites its sources.</p>
+      <div class="ask-wrap">
+        <div class="composer">
+          <textarea id="q" data-ph-en="e.g. How do I control stem borer in my maize without expensive pesticides?" data-ph-sw="mf. Ninawezaje kudhibiti wadudu wanaotoboa shina la mahindi?" placeholder="e.g. How do I control stem borer in my maize without expensive pesticides?"></textarea>
+          <div class="bar">
+            <button class="chip" data-fill="How do I control stem borer in my maize without expensive pesticides?"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 2 7l10 5 10-5z"/></svg>Stem borer</button>
+            <button class="chip" data-fill="How do I control rust on my beans?"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg>Bean rust</button>
+            <button class="chip" data-fill="How do I manage armyworm attacking my maize?"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 2v4M16 2v4M3 10h18"/></svg>Armyworm</button>
+            <button class="btn" style="margin-left:auto" id="askbtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4z"/></svg><span data-en="Ask" data-sw="Uliza">Ask</span></button>
+          </div>
+        </div>
+        <div class="status" id="askStatus" hidden></div>
+        <div class="answer" id="ans" hidden>
+          <div class="head"><span class="badge" id="ansConf" hidden></span><span class="t" data-en="Grounded advice" data-sw="Ushauri wenye vyanzo">Grounded advice</span></div>
+          <div class="body" id="ansbody"></div>
+          <div class="caveat" id="ansCaveat" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg><span data-en="Confirm with a local extension officer before using any product." data-sw="Thibitisha na afisa wa ugani kabla ya kutumia dawa yoyote.">Confirm with a local extension officer before using any product.</span></div>
+          <div class="sources" id="srcWrap" hidden>
+            <div class="lab" data-en="Based on" data-sw="Kutoka">Based on</div>
+            <div id="srcList"></div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-    <script src="app.js" defer></script>
-  </body>
+    <!-- DIAGNOSE -->
+    <section class="page" data-p="diagnose" hidden>
+      <p class="eyebrow" data-en="Photo diagnosis" data-sw="Utambuzi wa picha">Photo diagnosis</p>
+      <h1 class="disp" data-en="Show me the leaf." data-sw="Nionyeshe jani.">Show me the leaf.</h1>
+      <p class="sub" data-en="Upload a photo of an affected leaf. The vision model names the crop and disease, then pulls the matching guidance." data-sw="Pakia picha ya jani lililoathirika. Modeli hutambua zao na ugonjwa, kisha hutoa mwongozo.">Upload a photo of an affected leaf. The vision model names the crop and disease, then pulls the matching guidance.</p>
+      <div class="diag">
+        <div>
+          <div class="drop" id="drop">
+            <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5M12 3v12"/></svg></div>
+            <b data-en="Drop a leaf photo" data-sw="Weka picha ya jani">Drop a leaf photo</b>
+            <p data-en="or tap to use the kiosk camera" data-sw="au gusa kutumia kamera">or tap to use the kiosk camera</p>
+          </div>
+          <input type="file" id="photo" accept="image/*" hidden />
+          <button class="btn" style="width:100%;margin-top:14px;justify-content:center" id="analyze"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><span data-en="Analyze photo" data-sw="Chambua picha">Analyze photo</span></button>
+          <div class="status" id="dxStatus" hidden></div>
+        </div>
+        <div class="dx dim" id="dx">
+          <div class="top"><span class="big" data-en="Awaiting photo" data-sw="Inasubiri picha">Awaiting photo</span></div>
+          <div class="rows" id="dxRows">
+            <div class="r"><span class="k" data-en="Crop" data-sw="Zao">Crop</span><span>—</span></div>
+            <div class="r"><span class="k" data-en="Condition" data-sw="Hali">Condition</span><span>—</span></div>
+            <div class="r"><span class="k" data-en="Confidence" data-sw="Uhakika">Confidence</span><div class="conf-meter"><i id="cbar"></i></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FARMERS -->
+    <section class="page" data-p="farmers" hidden>
+      <p class="eyebrow" data-en="Farmer profiles" data-sw="Wasifu wa wakulima">Farmer profiles</p>
+      <h1 class="disp" data-en="The farmers you serve." data-sw="Wakulima unaowahudumia.">The farmers you serve.</h1>
+      <p class="sub" data-en="Each profile keeps a farmer's crops, growth stages, diagnoses, and the next action to take." data-sw="Kila wasifu huhifadhi mazao, hatua za ukuaji, utambuzi, na hatua inayofuata.">Each profile keeps a farmer's crops, growth stages, diagnoses, and the next action to take.</p>
+      <div style="margin:0 0 20px"><button class="btn" id="addFarmer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg><span data-en="New farmer" data-sw="Mkulima mpya">New farmer</span></button></div>
+      <div class="farmgrid" id="farmgrid"></div>
+    </section>
+
+    <!-- PROFILE -->
+    <section class="page" data-p="profile" hidden>
+      <button class="backlink" data-go="farmers"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg><span data-en="All farmers" data-sw="Wakulima wote">All farmers</span></button>
+      <div id="profbody"></div>
+    </section>
+
+    <!-- CROP HISTORY -->
+    <section class="page" data-p="history" hidden>
+      <p class="eyebrow" data-en="Crop history" data-sw="Historia ya mazao">Crop history</p>
+      <h1 class="disp" data-en="Every crop, every stage." data-sw="Kila zao, kila hatua.">Every crop, every stage.</h1>
+      <p class="sub" data-en="A running record across all farmers: crop, growth stage, disease found, and the guidance given." data-sw="Rekodi ya mazao yote: zao, hatua, ugonjwa, na mwongozo uliotolewa.">A running record across all farmers: crop, growth stage, disease found, and the guidance given.</p>
+      <div id="allhistory"></div>
+    </section>
+
+    <!-- SOURCES -->
+    <section class="page" data-p="sources" hidden>
+      <p class="eyebrow" data-en="Reference corpus" data-sw="Marejeo">Reference corpus</p>
+      <h1 class="disp" data-en="Where answers come from." data-sw="Majibu yanatoka wapi.">Where answers come from.</h1>
+      <p class="sub" data-en="Farm Pal only answers from these local Kenyan documents. Nothing is invented." data-sw="Farm Pal hujibu tu kutoka nyaraka hizi za Kenya. Hakuna kinachobuniwa.">Farm Pal only answers from these local Kenyan documents. Nothing is invented.</p>
+      <div class="doclist" id="doclist"></div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section class="page" data-p="settings" hidden>
+      <p class="eyebrow" data-en="Settings" data-sw="Mipangilio">Settings</p>
+      <h1 class="disp" data-en="Kiosk settings." data-sw="Mipangilio ya kiosk.">Kiosk settings.</h1>
+      <p class="sub" data-en="Language, model, and corpus status for this device." data-sw="Lugha, modeli, na hali ya marejeo ya kifaa hiki.">Language, model, and corpus status for this device.</p>
+      <div class="panelcard" style="max-width:520px">
+        <div class="feed">
+          <div class="row"><div class="av" style="background:var(--green)">EN</div><div><b data-en="Default language" data-sw="Lugha chaguo-msingi">Default language</b><span>English · Kiswahili</span></div><span class="when">EN/SW</span></div>
+          <div class="row"><div class="av" style="background:var(--clay)">AI</div><div><b data-en="Model" data-sw="Modeli">Model</b><span>Llama 3.2 1B · offline</span></div><span class="when">1.4 GB</span></div>
+          <div class="row"><div class="av" style="background:var(--leaf)">DB</div><div><b data-en="Corpus" data-sw="Marejeo">Corpus</b><span>KALRO · Infonet · beans + maize</span></div><span class="when">local</span></div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- Save / add record modal -->
+<div class="modal" id="modal" hidden>
+  <div class="sheet">
+    <h3 id="modalTitle" data-en="Save to farmer profile" data-sw="Hifadhi kwa mkulima">Save to farmer profile</h3>
+    <p class="sub" id="modalSub" data-en="Attach this diagnosis to a farmer's crop history." data-sw="Ambatanisha utambuzi huu kwenye historia ya mkulima.">Attach this diagnosis to a farmer's crop history.</p>
+    <div class="field" id="fldFarmer">
+      <label data-en="Farmer" data-sw="Mkulima">Farmer</label>
+      <select id="mFarmer"></select>
+    </div>
+    <div class="field" id="fldName" hidden>
+      <label data-en="Farmer name" data-sw="Jina la mkulima">Farmer name</label>
+      <input id="mName" placeholder="Wanjiru Kamau" />
+    </div>
+    <div class="field" id="fldCounty" hidden>
+      <label data-en="County" data-sw="Kaunti">County</label>
+      <input id="mCounty" placeholder="Nakuru" />
+    </div>
+    <div class="field" id="fldCrop">
+      <label data-en="Crop" data-sw="Zao">Crop</label>
+      <select id="mCrop"><option>Maize</option><option>Beans</option></select>
+    </div>
+    <div class="field">
+      <label data-en="Growth stage" data-sw="Hatua ya ukuaji">Growth stage</label>
+      <select id="mStage"><option>Germinating</option><option>Vegetative</option><option>Whorl</option><option>Flowering</option><option>Pod fill</option><option>Ripe for harvest</option></select>
+    </div>
+    <div class="field">
+      <label data-en="Diagnosis" data-sw="Utambuzi">Diagnosis</label>
+      <input id="mDisease" placeholder="Bean Rust" />
+    </div>
+    <div class="field">
+      <label data-en="Next action" data-sw="Hatua inayofuata">Next action</label>
+      <textarea id="mNext" placeholder="Guidance for the farmer"></textarea>
+    </div>
+    <div class="actions">
+      <button class="btn ghost" id="mCancel" data-en="Cancel" data-sw="Ghairi">Cancel</button>
+      <button class="btn" id="mSave" data-en="Save record" data-sw="Hifadhi">Save record</button>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
 </html>

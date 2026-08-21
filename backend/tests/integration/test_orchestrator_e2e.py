@@ -37,7 +37,7 @@ def test_retrieved_context_reaches_prompt(orchestrator, fake_llm):
         query="maize blight treatment", language="en"))
     # the fake LLM records the prompt it was handed
     assert fake_llm.last_prompt is not None
-    assert "Shamba Rafiki" in fake_llm.last_prompt.system_prompt
+    assert "Farm Pal" in fake_llm.last_prompt.system_prompt
     assert "maize" in fake_llm.last_prompt.full_prompt.lower()
 
 

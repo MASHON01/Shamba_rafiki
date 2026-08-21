@@ -1,4 +1,4 @@
-# Shamba Rafiki backend - Python API only (option B).
+# Farm Pal backend - Python API only (option B).
 #
 # This image contains the FastAPI backend ONLY. The LLM (llama.cpp /
 # llama-server) runs as a SEPARATE process/service, exactly as it does

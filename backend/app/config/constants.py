@@ -4,7 +4,7 @@ Application-wide constants.
 Only immutable values belong here.
 """
 
-APP_AUTHOR = "Shamba Rafiki Team"
+APP_AUTHOR = "Farm Pal Team"
 
 API_PREFIX = "/api/v1"
 
@@ -539,7 +539,14 @@ GGUF_MAGIC = b"GGUF"
 # Deterministic decoding for reproducible answers.
 LLM_DETERMINISTIC_SEED = 42
 LLM_MAX_TOKENS_CAP = 1024
-LLM_REPEAT_PENALTY = 1.1
+# Anti-repetition. The 1B is prone to runaway loops on weak context, so
+# these are set firmer than a larger model would need: a stronger repeat
+# penalty over a wider window, plus frequency/presence penalties that
+# discourage the model from re-emitting the same phrase verbatim.
+LLM_REPEAT_PENALTY = 1.3
+LLM_REPEAT_LAST_N = 256
+LLM_FREQUENCY_PENALTY = 0.6
+LLM_PRESENCE_PENALTY = 0.3
 LLM_TOP_K = 40
 
 # Retry/backoff for the resilient LLM client.

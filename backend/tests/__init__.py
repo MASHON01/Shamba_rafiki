@@ -1,5 +1,5 @@
 """
-Test suite for the Shamba Rafiki backend.
+Test suite for the Farm Pal backend.
 
 Marks `tests` as a package so test module names are unique across the
 parallel unit/, integration/, and api/ sub-packages (avoiding pytest

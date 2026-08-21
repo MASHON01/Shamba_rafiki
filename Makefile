@@ -1,4 +1,4 @@
-# Shamba Rafiki - developer command runner.
+# Farm Pal - developer command runner.
 # All targets run from the repository root. Run `make help` for the list.
 
 .DEFAULT_GOAL := help

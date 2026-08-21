@@ -1,7 +1,7 @@
 """
 Prompt engine & AI orchestrator (Phase 1, Output 6).
 
-The heart of Shamba Rafiki - the layer that ties language
+The heart of Farm Pal - the layer that ties language
 understanding and retrieval together, assembles a grounded prompt,
 and calls the LLM:
 

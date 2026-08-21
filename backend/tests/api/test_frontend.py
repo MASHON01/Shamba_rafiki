@@ -11,7 +11,7 @@ def test_ui_index_served(api_client):
     resp = api_client.get("/app/")
     assert resp.status_code == 200
     assert resp.headers["content-type"].startswith("text/html")
-    assert "Shamba Rafiki" in resp.text
+    assert "Farm Pal" in resp.text
 
 
 def test_ui_is_bilingual_and_links_app_js(api_client):

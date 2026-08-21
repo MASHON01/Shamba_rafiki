@@ -1,5 +1,5 @@
 {
-  "team_id": "REPLACE_WITH_YOUR_ADTF_TEAM_ID",
+  "team_id": "shamba_rafiki",
   "domain": "agriculture",
   "language_scope": ["en", "sw"],
   "african_alpha_claim": true,
@@ -17,11 +17,11 @@
   "test_prompts": [
     {
       "prompt_id": "tp_001",
-      "prompt": "My maize leaves have long grey-brown rectangular lesions running along the veins, and the lower leaves are drying first. What disease is this likely to be, and how should a smallholder farmer in Kenya manage it without expensive inputs?"
+      "prompt": "I'm a smallholder farmer in Machakos County growing maize on a sandy-loam plot. My plants are at the young whorl (knee-high) stage and I've found caterpillars boring into the stems with \"windowpane\" holes on the leaves. How can I control stem borer without using expensive pesticides?"
     },
     {
       "prompt_id": "tp_002",
-      "prompt": "I grow beans in Nakuru County and my plants have orange-brown rust pustules on the leaves. What is the recommended plant spacing for beans, and how can I reduce bean rust using practices available to a smallholder farmer?"
+      "prompt": "Mimi ni mkulima mdogo katika Kaunti ya Nakuru ninayelima maharagwe kwenye udongo wa tifutifu. Maharagwe yangu yako katika hatua ya kutoa maua, na nimeona madoa ya kutu ya rangi ya kahawia-nyekundu kwenye majani. Ninawezaje kudhibiti kutu bila kutumia dawa za gharama kubwa, na ni nafasi gani inayofaa kupanda maharagwe?"
     }
   ],
   "model": {

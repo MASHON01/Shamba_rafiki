@@ -1,4 +1,4 @@
-# Shamba Rafiki, ADTC 2026 Technical Report
+# Farm Pal, ADTC 2026 Technical Report
 
 **Track:** Agriculture. **Languages:** English and Kiswahili. **Target:** 8 GB RAM laptop, fully offline.
 **Model:** Llama-3.2-1B-Instruct (GGUF Q4_K_M) via llama.cpp.
@@ -8,12 +8,12 @@
 
 Smallholder farmers in Kenya lose a large share of their maize and bean
 harvests to pests and diseases they cannot easily diagnose. Extension officers
-are few, and the authoritative guidance (KALRO manuals, AFA crop strategies,
+are few and the authoritative guidance (KALRO manuals, AFA crop strategies,
 KAMIS market data, Infonet-Biovision) is scattered across PDFs and websites
-that a farmer with an entry-level phone, patchy connectivity, and a limited
+that a farmer with an entry-level phone, patchy connectivity and a limited
 data budget cannot practically consult in the field.
 
-Shamba Rafiki ("farming friend") is an offline advisory tool that runs on a
+Farm Pal (known locally as Shamba Rafiki, Swahili for 'farm friend') is an offline advisory tool that runs on a
 modest 8 GB laptop, the kind of shared kiosk device a cooperative, agro-dealer,
 or extension office can afford. A farmer asks a question in English or
 Kiswahili, or uploads a photo of an affected leaf, and gets practical advice
@@ -21,16 +21,16 @@ drawn from local reference material, with the sources shown. No internet is
 needed at question time.
 
 The intended user is a maize or bean smallholder in counties such as Nakuru,
-Kiambu, and Machakos. The scope is deliberately limited to maize and beans, and
+Kiambu and Machakos. The scope is deliberately limited to maize and beans, and
 to one or two counties we could source real data for, so the reference material
 stays accurate instead of broad but shallow.
 
 ## 2. Design decisions
 
-**Base model: Llama-3.2-1B-Instruct, Q4_K_M.** We picked the model from
+**Base model: Llama-3.2-1B-Instruct, Q4_K_M.** I picked the model from
 measured numbers, not by assumption. On a 4-core CPU laptop the 1B generates
 about 16 tokens per second and peaks at roughly 1.4 GB of RAM, leaving over
-5.5 GB of headroom under the 7 GB ceiling. We also measured a 3B Q4_K_M as the
+5.5 GB of headroom under the 7 GB ceiling. I also measured a 3B Q4_K_M as the
 alternative: it writes richer answers but manages only about 5.8 tokens per
 second and 3.4 GB of RAM on the same machine. Because the system retrieves
 supporting text before it answers, the smaller model's thinner built-in
@@ -40,7 +40,7 @@ and efficiency contribution to the score. All inference goes through llama.cpp
 (`llama-server`); no Python machine-learning stack stays resident while serving.
 
 **Retrieval before generation.** The model does not answer from memory alone. A
-local set of KALRO, AFA, KAMIS, and Infonet documents is processed offline into
+local set of KALRO, AFA, KAMIS  and Infonet documents is processed offline into
 text chunks, embedded with a multilingual MiniLM sentence-transformer
 (384-dimensional), and stored in a plain numpy vector store. At question time
 the app embeds the question, pulls the closest chunks (cosine similarity at or
@@ -54,11 +54,16 @@ If nothing relevant was retrieved, the app says so and points the farmer to an
 extension officer instead of inventing a recommendation. That matters here,
 because a wrong pesticide suggestion has a real cost.
 
-**Kiswahili support.** The language is detected automatically, and Swahili
-questions get a glossary and a worked example added to the prompt so a small
-model produces more usable Swahili. A LoRA fine-tuning pipeline is included as
-an optional extension, kept off unless it clearly beats the prompt-only version
-without eating the RAM headroom.
+**Kiswahili support, answered English-first.** A 1B model composes weak
+Kiswahili when it must also reason over English reference text, so the Swahili
+path splits the work: the question is translated to English, answered and
+grounded in English (the model's strong language), and the finished answer is
+translated back to Kiswahili. Translation runs fully offline through
+NLLB-200-distilled-600M on CTranslate2 (CPU, int8, roughly 600 MB, no PyTorch
+resident at serve time), so it adds fluency without touching the model that the
+profiler scores. If the translator is not built on a given machine, the app
+falls back to a Swahili-prompt path with a domain glossary and a worked example.
+A LoRA fine-tune is available as a further optional extension.
 
 **Computer vision paired with language.** A MobileNetV3-small classifier,
 trained on PlantVillage maize images and the iBean bean dataset and exported to
@@ -72,21 +77,21 @@ classifies in a few milliseconds. When it is unsure, it contributes at most the
 crop name to retrieval, so a weak guess cannot skew the answer.
 
 **Built to survive a real kiosk.** Separate connect and read timeouts, bounded
-retries, a circuit breaker, a small exact-match answer cache, and a startup
+retries, a circuit breaker, a small exact-match answer cache and a startup
 warm-up. If llama-server is unreachable, the app falls back to showing the
 retrieved reference material instead of failing.
 
 ## 3. Constraints that shaped the approach
 
 The 8 GB RAM, 4 vCPU, integrated-GPU, offline profile drove most choices.
-Running out of memory is an automatic disqualification, so peak memory was
+Running out of memory was not an option, so peak memory was
 treated as a primary constraint: a small quantized model, a numpy vector store
 instead of FAISS, ONNX instead of PyTorch at serve time, and a size-capped
 cache all exist to stay under the 7 GB ceiling. Sustained CPU inference can
-throttle, so we checked for it rather than assuming. Everything the farmer
+throttle, so I checked for it rather than assuming. Everything the farmer
 touches runs locally; the only network use is the one-time, offline build of
 the corpus and model. And because the advice has to trace back to real Kenyan
-sources, grounding, citations, and verification are not optional.
+sources, grounding, citations and verification are not optional.
 
 ## 4. System architecture
 
@@ -159,7 +164,7 @@ scores come from the official formulas:
 | S_eff (efficiency) | 1393.6 MB peak | 80.6 |
 
 For comparison, the 3B alternative on the same laptop scored S_perf 38.3
-(5.75 tokens/sec) and S_eff 51.9 (3450.6 MB peak). We chose the 1B because it
+(5.75 tokens/sec) and S_eff 51.9 (3450.6 MB peak). I chose the 1B because it
 roughly doubles the combined performance and efficiency contribution while
 retrieval keeps the answer quality practical.
 
@@ -175,9 +180,11 @@ look similar on a leaf; it occasionally confuses the two. The verification step
 reflects this by lowering the confidence band when the supporting evidence is
 weak, and the answer tells the farmer to confirm with an extension officer.
 
-Swahili answers from a 1B model are usable but weaker than English, and the
-model can occasionally mix in an English phrase. Retrieval grounding limits how
-far off an answer can go, and the honest fallback covers the rest.
+Kiswahili answers are produced English-first and translated back with an offline
+NLLB model, which is markedly more fluent than a 1B model composing Swahili
+directly, though stiff phrasing can remain on very domain-specific terms.
+Retrieval grounding still bounds the content, and the honest fallback covers the
+rest.
 
 ## 8. Reproducibility
 
@@ -198,17 +205,17 @@ adtc-profiler run --submission . --mode participant --output submission.json --s
 ```
 
 The test suite has 257 passing tests covering ingestion, retrieval, the LLM
-resilience and cache layers, the image path, and the API. Model weights and the
+resilience and cache layers, the image path and the API. Model weights and the
 trained ONNX classifier are kept out of git and are fetched or produced by the
 scripts, in line with the submission rules.
 
 ## 9. Bonuses
 
 **Budget Laptop Profile.** The system is designed around the 7 GB ceiling with
-measured headroom: a numpy vector store, ONNX inference, and a size-capped cache
+measured headroom: a numpy vector store, ONNX inference and a size-capped cache
 keep peak RAM near 1.4 GB, well under the limit.
 
-**African Use Case.** Shamba Rafiki is built for Kenyan smallholder maize and
+**African Use Case.** Farm Pal is built for Kenyan smallholder maize and
 bean farmers, grounded in Kenyan sources (KALRO, AFA, KAMIS, Infonet-Biovision),
 with Kiswahili support and an offline-first design for areas with little or no
 connectivity.

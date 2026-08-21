@@ -30,8 +30,11 @@ from dataclasses import dataclass, field, replace
 
 from app.config.constants import (
     LLM_DETERMINISTIC_SEED,
+    LLM_FREQUENCY_PENALTY,
     LLM_MAX_TOKENS,
     LLM_MAX_TOKENS_CAP,
+    LLM_PRESENCE_PENALTY,
+    LLM_REPEAT_LAST_N,
     LLM_REPEAT_PENALTY,
     LLM_STOP_SEQUENCES,
     LLM_TEMPERATURE,
@@ -61,6 +64,9 @@ class GenerationConfig:
     top_k: int = LLM_TOP_K
     max_tokens: int = LLM_MAX_TOKENS
     repeat_penalty: float = LLM_REPEAT_PENALTY
+    repeat_last_n: int = LLM_REPEAT_LAST_N
+    frequency_penalty: float = LLM_FREQUENCY_PENALTY
+    presence_penalty: float = LLM_PRESENCE_PENALTY
     seed: int | None = None
     stop: list[str] = field(default_factory=_default_stop)
 
@@ -72,6 +78,9 @@ class GenerationConfig:
         self.top_p = _clamp(float(self.top_p), 0.0, 1.0)
         self.top_k = max(0, int(self.top_k))
         self.repeat_penalty = _clamp(float(self.repeat_penalty), 0.0, 2.0)
+        self.repeat_last_n = max(0, int(self.repeat_last_n))
+        self.frequency_penalty = _clamp(float(self.frequency_penalty), 0.0, 2.0)
+        self.presence_penalty = _clamp(float(self.presence_penalty), 0.0, 2.0)
 
         max_tokens = int(self.max_tokens)
         if max_tokens < 1:
@@ -121,6 +130,9 @@ class GenerationConfig:
             "top_p": self.top_p,
             "top_k": self.top_k,
             "repeat_penalty": self.repeat_penalty,
+            "repeat_last_n": self.repeat_last_n,
+            "frequency_penalty": self.frequency_penalty,
+            "presence_penalty": self.presence_penalty,
             "stop": list(self.stop),
         }
         if self.seed is not None:

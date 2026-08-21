@@ -166,7 +166,7 @@ def _build_mock_stack() -> dict:
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Run the Shamba Rafiki benchmark suite.")
+    parser = argparse.ArgumentParser(description="Run the Farm Pal benchmark suite.")
     parser.add_argument("--mock", action="store_true",
                         help="Use fake components (harness smoke test; numbers are meaningless).")
     parser.add_argument("--stages", action="store_true", help="Per-stage benchmark only.")

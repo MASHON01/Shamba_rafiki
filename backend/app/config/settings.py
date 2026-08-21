@@ -25,7 +25,7 @@ class Settings(BaseSettings):
     # APPLICATION
     # ------------------------------------------------------------------
 
-    APP_NAME: str = "Shamba Rafiki Backend"
+    APP_NAME: str = "Farm Pal Backend"
     APP_VERSION: str = "0.1.0"
     APP_ENV: str = "development"
     DEBUG: bool = True
@@ -84,6 +84,14 @@ class Settings(BaseSettings):
 
     PROMPT_VERSION: str = "v1"
     SWAHILI_PROMPT_ENRICH: bool = True
+
+    # Offline fluent MT for Swahili (NLLB via CTranslate2). When enabled
+    # and the converted model exists, Swahili questions are answered
+    # English-first then translated back to Kiswahili. If the model is
+    # absent, the app silently falls back to the Swahili-prompt path.
+    SWAHILI_MT_ENABLED: bool = True
+    SWAHILI_MT_MODEL_DIR: str = "models/nllb-200-distilled-600M-ct2"
+    SWAHILI_MT_BEAM_SIZE: int = 2
 
     # ------------------------------------------------------------------
     # EMBEDDINGS

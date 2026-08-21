@@ -252,6 +252,6 @@ class ResilientLLMClient(BaseLLMClient):
 
     def health(self) -> bool:
         try:
-            return self._inner.health
+            return self._inner.health()
         except Exception:  # noqa: BLE001 - health never raises.
             return False

@@ -1,5 +1,5 @@
 """
-Shared pytest fixtures for the Shamba Rafiki backend suite.
+Shared pytest fixtures for the Farm Pal backend suite.
 
 Centralizes the test doubles and setup that the ad-hoc scripts used
 to copy-paste:

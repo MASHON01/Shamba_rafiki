@@ -85,6 +85,7 @@ llama.cpp/
 data/raw_documents/
 data/processed_documents/
 data/vector_store/
+data/vector_store_backup*/
 data/embeddings/
 data/reports/
 data/faiss/

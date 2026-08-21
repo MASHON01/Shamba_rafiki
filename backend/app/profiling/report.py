@@ -92,7 +92,7 @@ class PerformanceReport:
         headroom = RAM_CEILING_MB - peak
 
         lines: list[str] = []
-        title = "Shamba Rafiki - Performance Report"
+        title = "Farm Pal - Performance Report"
         if self.label:
             title += f" ({self.label})"
         lines.append(title)

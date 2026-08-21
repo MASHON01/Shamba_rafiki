@@ -44,7 +44,13 @@ def init_dependencies() -> None:
     # The cache is what lets an identical repeat question return instantly.
     llm_client = build_llm_client()
     dispatcher = Dispatcher(llm_client=llm_client, retriever=retriever)
-    _orchestrator = Orchestrator(llm_client=llm_client, dispatcher=dispatcher)
+    # Optional offline fluent-MT for Swahili; no-op if the model isn't built.
+    from app.language.mt_factory import build_translator
+
+    translator = build_translator()
+    _orchestrator = Orchestrator(
+        llm_client=llm_client, dispatcher=dispatcher, translator=translator
+    )
 
     # Pay the model's cold-start cost now, before the first farmer.
     if settings.WARMUP_ON_STARTUP:

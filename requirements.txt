@@ -72,6 +72,18 @@ Pillow>=11.3.0
 # dependency - build llama.cpp itself instead (make build-llama).
 
 ##################################################
+# OFFLINE TRANSLATOR  (Swahili fluent MT, optional)
+##################################################
+
+# NLLB-200-distilled-600M runs through CTranslate2 (CPU, int8) for
+# English<->Swahili. transformers ships transitively via
+# sentence-transformers and provides the tokenizer. Build the model once
+# with scripts/download_translator.sh; the app degrades gracefully if the
+# model is absent.
+ctranslate2>=4.3.0
+sentencepiece>=0.2.0
+
+##################################################
 # TESTING
 ##################################################
 

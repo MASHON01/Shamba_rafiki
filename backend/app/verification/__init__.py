@@ -11,7 +11,7 @@ answer + its retrieved sources into one signal; the fact verifier
 aggregates them, the confidence engine scores them, and the decision
 policy decides whether to approve, caveat, or replace the answer.
 
-This is what lets Shamba Rafiki honestly say "I'm not certain"
+This is what lets Farm Pal honestly say "I'm not certain"
 instead of confidently fabricating - the behaviour the hidden test
 prompts are designed to probe.
 

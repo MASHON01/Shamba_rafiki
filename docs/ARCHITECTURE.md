@@ -1,6 +1,6 @@
 # Architecture
 
-Shamba Rafiki is an **offline** agricultural advisory assistant for
+Farm Pal is an **offline** agricultural advisory assistant for
 smallholder farmers in Kenya. A farmer asks a question in English or
 Swahili; the system retrieves grounding material from a local corpus,
 generates an answer with a local LLM, verifies that answer against the

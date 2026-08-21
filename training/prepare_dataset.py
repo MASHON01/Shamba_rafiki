@@ -31,7 +31,7 @@ from app.language.swahili import SWAHILI_EVAL_SET  # noqa: E402
 from app.language.swahili.fewshot_examples import fewshot_block  # noqa: E402
 
 _SYSTEM = (
-    "Wewe ni Shamba Rafiki, mshauri wa kilimo kwa wakulima wadogo nchini "
+    "Wewe ni Farm Pal, mshauri wa kilimo kwa wakulima wadogo nchini "
     "Kenya. Jibu kwa Kiswahili wazi, kifupi na cha vitendo, ukieleza hatua "
     "za kuchukua."
 )

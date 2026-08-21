@@ -38,9 +38,11 @@ from app.verification import CheckResult
 _SENTENCE_RE = re.compile(r"(?<=[.!?])\s+")
 # Explicit citation references the model might emit.
 _CITATION_REF_RE = re.compile(r"\[?\s*source\s*(\d+)\s*\]?", re.IGNORECASE)
-# Fraction of a sentence's content words that must appear in a single
-# source for that sentence to count as grounded in it.
-_SENTENCE_GROUNDING_RATIO = 0.5
+# Fraction of a sentence's content words that must appear across the
+# retrieved sources for that sentence to count as grounded. Checked
+# against the union of all sources, so a correct paraphrase that draws
+# on more than one retrieved chunk is not wrongly marked uncited.
+_SENTENCE_GROUNDING_RATIO = 0.4
 
 
 class CitationChecker:
@@ -92,13 +94,13 @@ class CitationChecker:
                 flags=flags + ["uncited_claims"],
             )
 
-        source_word_sets = [
-            self._content_words(r.chunk.text) for r in sources
-        ]
+        source_words: set[str] = set()
+        for r in sources:
+            source_words |= self._content_words(r.chunk.text)
 
         grounded = 0
         for sentence in substantive:
-            if self._is_grounded(sentence, source_word_sets):
+            if self._is_grounded(sentence, source_words):
                 grounded += 1
 
         ungrounded = len(substantive) - grounded
@@ -123,16 +125,13 @@ class CitationChecker:
     def _is_grounded(
         self,
         sentence: str,
-        source_word_sets: list[set[str]],
+        source_words: set[str],
     ) -> bool:
         words = self._content_words(sentence)
         if not words:
             return True
-        for source_words in source_word_sets:
-            overlap = len(words & source_words) / len(words)
-            if overlap >= _SENTENCE_GROUNDING_RATIO:
-                return True
-        return False
+        overlap = len(words & source_words) / len(words)
+        return overlap >= _SENTENCE_GROUNDING_RATIO
 
     def _content_words(self, text: str) -> set[str]:
         return {

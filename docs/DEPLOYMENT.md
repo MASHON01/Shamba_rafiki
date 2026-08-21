@@ -1,6 +1,6 @@
 # Deployment Guide
 
-Shamba Rafiki is designed to run **offline** on a modest kiosk machine:
+Farm Pal is designed to run **offline** on a modest kiosk machine:
 an 8 GB RAM target, with a hard budget of **7 GB** to stay safely below
 the ceiling. This guide covers deploying the backend and llama-server
 together.

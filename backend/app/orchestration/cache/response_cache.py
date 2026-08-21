@@ -70,7 +70,7 @@ class ResponseCache:
         self._cache.put(key, result, size)
 
     def stats(self) -> CacheStats:
-        return self._cache.stats
+        return self._cache.stats()
 
     def clear(self) -> None:
         self._cache.clear()
@@ -93,7 +93,7 @@ class CachingLLMClient(BaseLLMClient):
         return getattr(self._inner, "supports_streaming", False)
 
     def stats(self) -> CacheStats:
-        return self._cache.stats
+        return self._cache.stats()
 
     def generate(self, prompt, config=None) -> GenerationResult:
         cached = self._cache.get(prompt.full_prompt, config)
@@ -124,7 +124,7 @@ class CachingLLMClient(BaseLLMClient):
 
             # Cache only a fully-completed stream, never a partial/cancelled one.
         if assembler.done and assembler.text:
-            self._cache.put(prompt.full_prompt, config, assembler.finalize)
+            self._cache.put(prompt.full_prompt, config, assembler.finalize())
 
     def health(self) -> bool:
-        return self._inner.health
+        return self._inner.health()

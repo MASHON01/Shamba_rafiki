@@ -18,7 +18,7 @@ from app.orchestration.prompts.templates.output_format import OUTPUT_FORMAT_EN
 # ===========================================================================
 
 EN_V1_BASE = (
-    "You are Shamba Rafiki, an offline farming advisor for smallholder "
+    "You are Farm Pal, an offline farming advisor for smallholder "
     "farmers in Kenya. Answer using ONLY the reference material provided "
     "below. If the material does not cover the question, say so clearly "
     "and give only general, widely-accepted guidance - never invent "
@@ -50,7 +50,7 @@ EN_V1_INTENT: dict[str, str] = {
 # ===========================================================================
 
 EN_V2_BASE = (
-    "You are Shamba Rafiki, an offline farming advisor for smallholder "
+    "You are Farm Pal, an offline farming advisor for smallholder "
     "farmers in Kenya. Follow these rules strictly:\n"
     "1. Ground every specific claim - figures, dosages, product names, "
     "prices - in the numbered reference material below. Do not rely on "

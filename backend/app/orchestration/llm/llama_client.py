@@ -39,6 +39,7 @@ from app.config.constants import (
 from app.config.settings import settings
 from app.core.exceptions import ShambaRafikiError
 from app.orchestration.llm.base import BaseLLMClient, GenerationResult
+from app.orchestration.llm.generation_config import GenerationConfig
 from app.orchestration.prompts.builder import BuiltPrompt
 from app.utils.logger import get_logger
 
@@ -80,13 +81,23 @@ class LlamaClient(BaseLLMClient):
     def generate(self, prompt: BuiltPrompt, config=None) -> GenerationResult:
         requests = self._load_requests()
 
+        # Use the caller's config when given, otherwise build one from this
+        # client's construction defaults. Either way the full sampling set -
+        # including repeat/frequency/presence penalties and top_k - is sent;
+        # without them llama-server applies no repetition penalty and the 1B
+        # loops on weak context.
+        if config is None:
+            config = GenerationConfig(
+                max_tokens=self._max_tokens,
+                temperature=self._temperature,
+                top_p=self._top_p,
+                stop=list(self._stop),
+            )
+
         payload = {
             "prompt": prompt.full_prompt,
-            "n_predict": self._max_tokens,
-            "temperature": self._temperature,
-            "top_p": self._top_p,
-            "stop": self._stop,
             "stream": False,
+            **config.to_payload(),
         }
 
         url = f"{self._server_url}{_COMPLETION_PATH}"

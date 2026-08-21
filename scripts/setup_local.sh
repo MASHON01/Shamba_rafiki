@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Shamba Rafiki - local bootstrap.
+# Farm Pal - local bootstrap.
 #
 # Gets a fresh checkout to a runnable state on this machine:
 #   1. create a Python virtualenv and install dependencies

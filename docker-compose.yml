@@ -1,4 +1,4 @@
-# Shamba Rafiki - local/kiosk composition.
+# Farm Pal - local/kiosk composition.
 #
 # Two services, matching the real architecture:
 #   backend      the FastAPI app (this repo's Dockerfile)

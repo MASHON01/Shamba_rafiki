@@ -34,7 +34,7 @@ from app.models.language import LanguageCode
 # --- English -------------------------------------------------------------
 
 _EN_BASE = (
-    "You are Shamba Rafiki, an offline farming advisor for smallholder "
+    "You are Farm Pal, an offline farming advisor for smallholder "
     "farmers in Kenya. Answer using ONLY the reference material provided "
     "below. If the material does not cover the question, say so clearly "
     "and give only general, widely-accepted guidance - never invent "
@@ -64,7 +64,7 @@ _EN_INTENT = {
 # --- Swahili --------------------------------------------------------------
 
 _SW_BASE = (
-    "Wewe ni Shamba Rafiki, mshauri wa kilimo asiyetumia mtandao kwa "
+    "Wewe ni Farm Pal, mshauri wa kilimo asiyetumia mtandao kwa "
     "wakulima wadogo nchini Kenya. Jibu kwa kutumia TU maelezo ya rejea "
     "yaliyotolewa hapa chini. Kama maelezo hayana jibu, sema wazi na utoe "
     "ushauri wa jumla tu unaokubalika - usibuni kamwe takwimu, majina ya "

@@ -44,12 +44,17 @@ class Orchestrator:
         router: RequestRouter | None = None,
         verifier: Verifier | None = None,
         classifier=None,
+        translator=None,
     ) -> None:
         self._memory = memory or ConversationMemory()
         self._router = router or RequestRouter()
         self._dispatcher = dispatcher or Dispatcher(llm_client=llm_client)
         self._verifier = verifier or Verifier()
         self._classifier = classifier
+        # Optional fluent-MT translator. When present with a live engine,
+        # Swahili questions are answered English-first then translated
+        # back. When None (or engine-less), the Swahili-prompt path runs.
+        self._translator = translator
 
     def _get_classifier(self):
         if self._classifier is None:
@@ -70,12 +75,26 @@ class Orchestrator:
             language_hint=request.language,
             query_chars=len(request.query),
         )
+        # Swahili + fluent MT available: run the pipeline in English (the
+        # model's strong language) on a translated query, then translate
+        # the finished answer back. Otherwise run natively.
+        translate_sw = self._should_translate(request)
+        if translate_sw:
+            pipeline_query = self._translate(
+                request.query, LanguageCode.SWAHILI, LanguageCode.ENGLISH
+            )
+            pipeline_hint = "en"
+            logger.info("orchestrator.mt.query_translated", request_id=str(request.request_id))
+        else:
+            pipeline_query = request.query
+            pipeline_hint = request.language
+
         history = self._memory.get_history(request.session_id)
         plan = self._router.route_text()
 
         try:
             prepared = self._dispatcher.prepare(
-                query=request.query, plan=plan, language_hint=request.language, history=history
+                query=pipeline_query, plan=plan, language_hint=pipeline_hint, history=history
             )
         except Exception as exc:  # noqa: BLE001
             logger.exception("orchestrator.prepare_failed", request_id=str(request.request_id))
@@ -88,7 +107,12 @@ class Orchestrator:
         try:
             generation = self._dispatcher._llm.generate(prepared.prompt)
         except LLMError as exc:
-            return self._degraded_response(request, prepared, exc)
+            return self._degraded_response(
+                request,
+                prepared,
+                exc,
+                force_language=LanguageCode.SWAHILI if translate_sw else None,
+            )
         except Exception as exc:  # noqa: BLE001
             logger.exception("orchestrator.unexpected_error", request_id=str(request.request_id))
             return error_response(
@@ -101,6 +125,19 @@ class Orchestrator:
             generation.text, prepared.context.sources, language=prepared.language
         )
         answer = verified.text
+
+        if translate_sw:
+            answer = self._translate(answer, LanguageCode.ENGLISH, LanguageCode.SWAHILI)
+            self._memory.add_turn(request.session_id, request.query, answer)
+            return self._success(
+                request,
+                prepared,
+                generation,
+                verified,
+                answer_override=answer,
+                language_override=LanguageCode.SWAHILI.value,
+            )
+
         self._memory.add_turn(request.session_id, request.query, answer)
         return self._success(request, prepared, generation, verified)
 
@@ -211,10 +248,19 @@ class Orchestrator:
     # Shared response building
     # ------------------------------------------------------------------
 
-    def _success(self, request, prepared, generation, verified, vision=None) -> dict:
+    def _success(
+        self,
+        request,
+        prepared,
+        generation,
+        verified,
+        vision=None,
+        answer_override=None,
+        language_override=None,
+    ) -> dict:
         data = {
-            "answer": verified.text,
-            "language": prepared.analysis.detection.language.value,
+            "answer": answer_override if answer_override is not None else verified.text,
+            "language": language_override or prepared.analysis.detection.language.value,
             "intent": prepared.analysis.intent,
             "sources": self._format_sources(prepared.context.sources),
             "grounded": prepared.context.has_context,
@@ -226,7 +272,7 @@ class Orchestrator:
         metadata = {
             "request_id": str(request.request_id),
             "session_id": request.session_id,
-            "translated": prepared.analysis.translated,
+            "translated": bool(prepared.analysis.translated or answer_override is not None),
             "prompt_tokens": generation.prompt_tokens,
             "completion_tokens": generation.completion_tokens,
             "latency_ms": generation.latency_ms,
@@ -235,9 +281,19 @@ class Orchestrator:
         }
         return success_response(data=data, message="Answer generated.", metadata=metadata)
 
-    def _degraded_response(self, request, prepared: PreparedRequest, exc: Exception) -> dict:
+    def _degraded_response(
+        self,
+        request,
+        prepared: PreparedRequest,
+        exc: Exception,
+        force_language: LanguageCode | None = None,
+    ) -> dict:
         sources = self._format_sources(prepared.context.sources)
-        notice = _UNAVAILABLE_SW if prepared.language == LanguageCode.SWAHILI else _UNAVAILABLE_EN
+        is_sw = (
+            force_language == LanguageCode.SWAHILI
+            or prepared.language == LanguageCode.SWAHILI
+        )
+        notice = _UNAVAILABLE_SW if is_sw else _UNAVAILABLE_EN
         logger.info(
             "orchestrator.degraded", request_id=str(request.request_id), sources=len(sources)
         )
@@ -251,6 +307,42 @@ class Orchestrator:
                 "language": prepared.analysis.detection.language.value,
             },
         )
+
+    # ------------------------------------------------------------------
+    # Swahili machine translation (optional, English-first pipeline)
+    # ------------------------------------------------------------------
+
+    def _should_translate(self, request: QueryRequest) -> bool:
+        """
+        True when fluent MT is live and the question is Swahili - decided
+        by the UI language tab OR by detecting the text itself. A Swahili
+        question typed while the tab still says English is therefore still
+        handled (translated, grounded, answered in Swahili) rather than
+        confusing the small model with a Swahili question in an English
+        prompt.
+        """
+        if self._translator is None or not self._translator.has_engine:
+            return False
+        hint = (request.language or "").strip().lower()
+        if hint.startswith("sw"):
+            return True
+        return self._looks_swahili(request.query)
+
+    def _looks_swahili(self, text: str) -> bool:
+        try:
+            from app.language.detector import LanguageDetector
+
+            return LanguageDetector().detect(text).language == LanguageCode.SWAHILI
+        except Exception:  # noqa: BLE001 - detection is best-effort
+            return False
+
+    def _translate(self, text: str, source: LanguageCode, target: LanguageCode) -> str:
+        try:
+            result = self._translator.translate(text, source=source, target=target)
+            return result.translated_text or text
+        except Exception as exc:  # noqa: BLE001 - never fail a query on MT
+            logger.warning("orchestrator.mt.failed", reason=str(exc))
+            return text
 
     # ------------------------------------------------------------------
     # Health

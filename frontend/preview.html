@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Farm Pal — Studio</title>
+<style>
+  :root{
+    --bg:#F4EFE6; --panel:#FBF8F2; --card:#FFFFFF; --ink:#26231C; --ink-soft:#5F594C;
+    --line:#E6DFD1; --green:#254A34; --green-2:#2F5C41; --leaf:#5C8A3A; --leaf-2:#6FA544;
+    --clay:#C56A3E; --clay-soft:#EBD9CD; --sage:#8AA07E; --gold:#C9A24B;
+    --sidebar:#20362A; --sidebar-2:#1A2C22; --sidebar-ink:#D8E4D5; --sidebar-mut:#8FA891;
+    --radius:14px; --shadow:0 1px 2px rgba(30,25,15,.05),0 8px 24px rgba(30,25,15,.06);
+    --serif:"Iowan Old Style","Palatino Linotype","Book Antiqua",Georgia,serif;
+    --sans:-apple-system,system-ui,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --mono:"SF Mono",ui-monospace,"Cascadia Mono","Roboto Mono",Menlo,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;font-size:15px;line-height:1.5}
+  .app{display:grid;grid-template-columns:248px 1fr;height:100vh;overflow:hidden}
+
+  /* ---------- Sidebar ---------- */
+  .side{background:var(--sidebar);color:var(--sidebar-ink);display:flex;flex-direction:column;padding:22px 16px;position:relative}
+  .brand{display:flex;align-items:center;gap:11px;padding:6px 8px 20px}
+  .logo{width:38px;height:38px;border-radius:11px;background:var(--leaf-2);display:grid;place-items:center;flex:none}
+  .logo svg{width:22px;height:22px}
+  .brand b{font-family:var(--serif);font-size:20px;font-weight:600;letter-spacing:.2px}
+  .brand small{display:block;font-family:var(--mono);font-size:9.5px;letter-spacing:.18em;color:var(--sidebar-mut);text-transform:uppercase;margin-top:2px}
+  .nav-label{font-family:var(--mono);font-size:9.5px;letter-spacing:.18em;color:var(--sidebar-mut);text-transform:uppercase;padding:16px 10px 8px}
+  .nav{display:flex;flex-direction:column;gap:2px}
+  .nav a{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:10px;color:var(--sidebar-ink);text-decoration:none;font-size:14px;cursor:pointer;position:relative;transition:background .18s ease,color .18s ease,transform .18s ease}
+  .nav a svg{width:19px;height:19px;opacity:.85;flex:none}
+  .nav a:hover{background:rgba(255,255,255,.06);transform:translateX(2px)}
+  .nav a.active{background:rgba(111,165,68,.16);color:#EAF3DE}
+  .nav a.active::before{content:"";position:absolute;left:-16px;top:9px;bottom:9px;width:3px;border-radius:0 3px 3px 0;background:var(--leaf-2)}
+  .nav a .dot{margin-left:auto;width:7px;height:7px;border-radius:50%;background:var(--clay);box-shadow:0 0 0 4px rgba(197,106,62,.18)}
+  .side-foot{margin-top:auto;padding-top:16px;border-top:1px solid rgba(255,255,255,.08)}
+  .userchip{display:flex;align-items:center;gap:10px;padding:8px}
+  .userchip .av{width:32px;height:32px;border-radius:50%;background:var(--clay);color:#fff;display:grid;place-items:center;font-weight:600;font-size:12px;flex:none}
+  .userchip small{color:var(--sidebar-mut);font-size:12px}
+
+  /* ---------- Main ---------- */
+  .main{overflow-y:auto;position:relative}
+  .topbar{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:16px;padding:18px 34px;background:rgba(244,239,230,.82);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  .crumb{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-soft)}
+  .crumb b{color:var(--ink)}
+  .search{margin-left:auto;display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:8px 14px;width:240px;color:var(--ink-soft)}
+  .search input{border:0;outline:0;background:transparent;font-size:13px;width:100%;color:var(--ink)}
+  .langtog{display:flex;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:3px}
+  .langtog button{border:0;background:transparent;padding:6px 13px;border-radius:999px;font-size:12.5px;font-weight:600;color:var(--ink-soft);cursor:pointer;transition:all .18s}
+  .langtog button.on{background:var(--green);color:#fff}
+  .cta{display:inline-flex;align-items:center;gap:8px;background:var(--leaf-2);color:#173404;border:0;border-radius:999px;padding:10px 18px;font-weight:600;font-size:13.5px;cursor:pointer;transition:transform .16s,background .16s;font-family:var(--sans)}
+  .cta:hover{background:#7cb44f;transform:translateY(-1px)}
+  .cta svg{width:16px;height:16px}
+
+  .page{padding:30px 34px 60px;animation:rise .5s cubic-bezier(.2,.7,.2,1) both}
+  .page.hide{display:none}
+  @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  .eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--clay);margin:0 0 10px}
+  h1.disp{font-family:var(--serif);font-size:40px;line-height:1.05;font-weight:600;margin:0 0 10px;letter-spacing:-.5px}
+  h1.disp em{font-style:italic;color:var(--clay)}
+  .sub{font-size:16px;color:var(--ink-soft);max-width:560px;margin:0 0 22px}
+
+  /* hero */
+  .hero{display:grid;grid-template-columns:1.15fr .85fr;gap:26px;align-items:stretch}
+  .hero-card{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:34px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+  .hero-actions{display:flex;gap:12px;margin-top:22px;flex-wrap:wrap}
+  .btn{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:11px 18px;font-weight:600;font-size:13.5px;cursor:pointer;border:1px solid var(--green);background:var(--green);color:#fff;transition:transform .16s,background .16s}
+  .btn.ghost{background:transparent;color:var(--green);border-color:var(--line)}
+  .btn:hover{transform:translateY(-1px)}
+  .btn.ghost:hover{background:#fff;border-color:var(--green)}
+  .btn svg{width:16px;height:16px}
+  .hero-visual{background:linear-gradient(0deg,#EFE7D8,#F7F1E6);border:1px solid var(--line);border-radius:20px;padding:26px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:var(--shadow);position:relative}
+  .leaf-badge{position:absolute;top:20px;right:20px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 12px;box-shadow:var(--shadow)}
+  .leaf-badge .k{font-family:var(--mono);font-size:9px;letter-spacing:.14em;color:var(--ink-soft);text-transform:uppercase}
+  .leaf-badge .v{font-weight:600;font-size:13px;display:flex;align-items:center;gap:6px}
+  .pass{color:var(--leaf);font-family:var(--mono);font-weight:600}
+  .leafart{width:100%;height:170px;display:grid;place-items:center;margin:14px 0}
+  .leafart svg{width:150px;height:150px}
+
+  /* metric cards */
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin:26px 0}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);transition:transform .2s}
+  .stat:hover{transform:translateY(-3px)}
+  .stat .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft)}
+  .stat .n{font-family:var(--serif);font-size:32px;font-weight:600;margin-top:8px;line-height:1}
+  .stat .d{font-size:12px;color:var(--leaf);margin-top:6px;font-weight:600}
+  .stat .ic{width:34px;height:34px;border-radius:10px;background:#EFF3E7;display:grid;place-items:center;float:right}
+  .stat .ic svg{width:18px;height:18px;color:var(--leaf)}
+
+  .grid2{display:grid;grid-template-columns:1.4fr 1fr;gap:22px;margin-top:6px}
+  .panelcard{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;box-shadow:var(--shadow)}
+  .panelcard h3{font-family:var(--serif);font-size:19px;font-weight:600;margin:0 0 4px}
+  .panelcard .meta{font-size:12.5px;color:var(--ink-soft);margin:0 0 16px}
+  .feed{display:flex;flex-direction:column}
+  .feed .row{display:flex;align-items:center;gap:13px;padding:12px 0;border-top:1px solid var(--line)}
+  .feed .row:first-child{border-top:0}
+  .feed .av{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;flex:none;color:#fff;font-weight:600;font-size:13px}
+  .feed .row b{font-size:14px}
+  .feed .row span{font-size:12.5px;color:var(--ink-soft)}
+  .feed .row .when{margin-left:auto;font-size:11.5px;color:var(--ink-soft);font-family:var(--mono)}
+
+  .badge{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;padding:4px 10px;border-radius:999px;font-family:var(--sans)}
+  .b-rust{background:#F6E4D8;color:#8f3f18}
+  .b-als{background:#Ebe3F5;color:#5a3d86}
+  .b-borer{background:#F7E7C9;color:#7a5410}
+  .b-gray{background:#E4E7E1;color:#41493f}
+  .b-healthy{background:#E1F0DE;color:#2c6b3a}
+  .b-stage{background:#E7EEF6;color:#2b5480}
+  .b-high{background:#E1F0DE;color:#2c6b3a}
+  .b-med{background:#FaEED6;color:#8a5f14}
+  .b-low{background:#F1E7DE;color:#7a5a3a}
+
+  /* Ask */
+  .ask-wrap{max-width:760px}
+  .composer{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:18px}
+  .composer textarea{width:100%;border:0;outline:0;resize:none;font-family:var(--sans);font-size:16px;color:var(--ink);min-height:60px;background:transparent}
+  .composer .bar{display:flex;align-items:center;gap:10px;margin-top:10px;border-top:1px solid var(--line);padding-top:12px}
+  .chip{display:inline-flex;align-items:center;gap:7px;background:#F2EEE4;border:1px solid var(--line);border-radius:999px;padding:8px 12px;font-size:12.5px;color:var(--ink-soft);cursor:pointer;transition:all .16s}
+  .chip:hover{background:#fff;color:var(--ink);border-color:var(--sage)}
+  .chip svg{width:14px;height:14px}
+  .answer{margin-top:22px;background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);overflow:hidden;opacity:0;transform:translateY(8px);transition:opacity .4s,transform .4s}
+  .answer.show{opacity:1;transform:none}
+  .answer .head{display:flex;align-items:center;gap:12px;padding:16px 22px;border-bottom:1px solid var(--line);background:#FBF8F2}
+  .answer .head .t{font-family:var(--serif);font-size:17px;font-weight:600}
+  .answer .body{padding:20px 22px;font-size:15.5px;line-height:1.65;color:#332f27}
+  .answer .body p{margin:0 0 12px}
+  .caveat{display:flex;gap:10px;align-items:flex-start;background:#FBF3E4;border:1px solid #Ebdcc0;border-radius:12px;padding:12px 14px;font-size:13.5px;color:#7a5a2a;margin-top:6px}
+  .caveat svg{width:17px;height:17px;flex:none;margin-top:1px}
+  .sources{padding:14px 22px 20px}
+  .sources .lab{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:10px}
+  .src{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--line);font-size:13.5px}
+  .src svg{width:16px;height:16px;color:var(--clay);flex:none}
+  .src .sc{margin-left:auto;font-family:var(--mono);font-size:12px;color:var(--leaf);font-weight:600}
+
+  /* Diagnose */
+  .diag{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
+  .drop{background:var(--card);border:2px dashed #D9CFBD;border-radius:18px;padding:34px;text-align:center;transition:border-color .2s,background .2s;cursor:pointer}
+  .drop:hover{border-color:var(--leaf);background:#FBFBF6}
+  .drop .ico{width:56px;height:56px;border-radius:16px;background:#EFF3E7;display:grid;place-items:center;margin:0 auto 14px}
+  .drop .ico svg{width:28px;height:28px;color:var(--leaf)}
+  .drop b{font-size:16px}
+  .drop p{font-size:13px;color:var(--ink-soft);margin:6px 0 0}
+  .leafthumb{width:100%;height:210px;border-radius:14px;background:linear-gradient(135deg,#dfe9cf,#c9dcae);display:grid;place-items:center;margin-bottom:14px}
+  .leafthumb svg{width:120px;height:120px}
+  .dx{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);overflow:hidden}
+  .dx .top{padding:18px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px}
+  .dx .top .big{font-family:var(--serif);font-size:18px;font-weight:600}
+  .dx .rows{padding:8px 20px 18px}
+  .dx .r{display:flex;align-items:center;gap:12px;padding:11px 0;border-top:1px solid var(--line);font-size:13.5px}
+  .dx .r:first-child{border-top:0}
+  .dx .r .k{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);width:96px;flex:none}
+  .conf-meter{height:7px;border-radius:999px;background:#EDE6D8;overflow:hidden;flex:1}
+  .conf-meter i{display:block;height:100%;background:var(--leaf-2);border-radius:999px;width:0;transition:width 1s cubic-bezier(.2,.7,.2,1)}
+  .nextbox{margin:0 20px 20px;background:#F3F7EC;border:1px solid #DBE7C9;border-radius:12px;padding:14px 16px}
+  .nextbox .k{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--leaf);margin-bottom:6px}
+  .nextbox p{margin:0;font-size:14px;color:#33402a;line-height:1.55}
+
+  /* Farmers */
+  .farmgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:18px}
+  .farm{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:var(--shadow);cursor:pointer;transition:transform .2s,border-color .2s}
+  .farm:hover{transform:translateY(-4px);border-color:var(--sage)}
+  .farm .h{display:flex;align-items:center;gap:12px}
+  .farm .av{width:46px;height:46px;border-radius:13px;display:grid;place-items:center;color:#fff;font-weight:600;font-size:16px;flex:none}
+  .farm .h b{font-size:16px;display:block}
+  .farm .h span{font-size:12.5px;color:var(--ink-soft);display:flex;align-items:center;gap:5px}
+  .farm .h span svg{width:13px;height:13px}
+  .farm .cropline{display:flex;gap:7px;flex-wrap:wrap;margin-top:15px}
+  .farm .foot{display:flex;align-items:center;gap:8px;margin-top:16px;padding-top:14px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink-soft)}
+  .farm .foot .alert{margin-left:auto;color:var(--clay);font-weight:600;display:flex;align-items:center;gap:5px}
+  .farm .foot .alert svg{width:14px;height:14px}
+
+  /* Profile / crop history */
+  .profhead{display:flex;align-items:center;gap:18px;background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:24px;box-shadow:var(--shadow);margin-bottom:24px}
+  .profhead .av{width:64px;height:64px;border-radius:18px;display:grid;place-items:center;color:#fff;font-weight:600;font-size:22px;flex:none}
+  .profhead h2{font-family:var(--serif);font-size:26px;font-weight:600;margin:0}
+  .profhead .m{font-size:13.5px;color:var(--ink-soft);display:flex;gap:16px;margin-top:6px;flex-wrap:wrap}
+  .profhead .m span{display:flex;align-items:center;gap:6px}
+  .profhead .m svg{width:15px;height:15px;color:var(--sage)}
+  .profstats{margin-left:auto;display:flex;gap:26px;text-align:center}
+  .profstats .n{font-family:var(--serif);font-size:26px;font-weight:600}
+  .profstats .k{font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft)}
+  .timeline{position:relative;padding-left:26px}
+  .timeline::before{content:"";position:absolute;left:8px;top:6px;bottom:6px;width:2px;background:var(--line)}
+  .entry{position:relative;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px 22px;box-shadow:var(--shadow);margin-bottom:16px;transition:transform .18s}
+  .entry:hover{transform:translateX(3px)}
+  .entry::before{content:"";position:absolute;left:-22px;top:24px;width:12px;height:12px;border-radius:50%;background:var(--leaf-2);border:3px solid var(--bg)}
+  .entry.warn::before{background:var(--clay)}
+  .entry .eh{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .entry .eh b{font-family:var(--serif);font-size:18px;font-weight:600}
+  .entry .eh .date{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--ink-soft)}
+  .entry .kv{display:flex;gap:26px;margin:14px 0;flex-wrap:wrap}
+  .entry .kv .c .k{font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft)}
+  .entry .kv .c .v{font-size:14px;font-weight:600;margin-top:4px}
+  .entry .next{background:#F3F7EC;border-left:3px solid var(--leaf-2);border-radius:0 10px 10px 0;padding:11px 14px;font-size:13.5px;color:#33402a;display:flex;gap:9px;align-items:flex-start}
+  .entry .next.warn{background:#FBF1E7;border-left-color:var(--clay);color:#6f4a2c}
+  .entry .next svg{width:16px;height:16px;flex:none;margin-top:1px}
+  .entry .next b{font-weight:600}
+  .addbtn{display:inline-flex;align-items:center;gap:8px;background:transparent;border:1px dashed #cbbfa9;color:var(--green);border-radius:12px;padding:12px 16px;font-size:13.5px;font-weight:600;cursor:pointer;width:100%;justify-content:center;transition:all .18s}
+  .addbtn:hover{background:#fff;border-color:var(--leaf)}
+  .backlink{display:inline-flex;align-items:center;gap:7px;color:var(--ink-soft);font-size:13px;cursor:pointer;margin-bottom:16px;background:none;border:0;font-family:var(--sans)}
+  .backlink:hover{color:var(--ink)}
+  .backlink svg{width:15px;height:15px}
+
+  .doclist{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+  .doc{display:flex;align-items:center;gap:13px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:var(--shadow)}
+  .doc .ic{width:40px;height:40px;border-radius:11px;background:#F2EEE4;display:grid;place-items:center;flex:none}
+  .doc .ic svg{width:20px;height:20px;color:var(--clay)}
+  .doc b{font-size:14px}
+  .doc span{font-size:12px;color:var(--ink-soft)}
+  @media(max-width:900px){.app{grid-template-columns:72px 1fr}.brand b,.brand small,.nav a span,.nav-label,.userchip div{display:none}.hero,.diag,.grid2{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- SIDEBAR -->
+  <aside class="side">
+    <div class="brand">
+      <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="#173404" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6"/></svg></div>
+      <div><b>Farm Pal</b><small>Shamba Rafiki</small></div>
+    </div>
+    <div class="nav-label">Workspace</div>
+    <nav class="nav" id="nav">
+      <a data-page="home" class="active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5 12 3l9 6.5V21H3z"/><path d="M9 21v-6h6v6"/></svg><span>Home</span></a>
+      <a data-page="ask"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>Ask</span></a>
+      <a data-page="diagnose"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg><span>Diagnose</span></a>
+      <a data-page="farmers"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg><span>Farmers</span><i class="dot"></i></a>
+      <a data-page="history"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l4 2"/></svg><span>Crop history</span></a>
+      <a data-page="sources"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg><span>Sources</span></a>
+    </nav>
+    <div class="side-foot">
+      <div class="nav-label" style="padding-top:0">System</div>
+      <nav class="nav">
+        <a data-page="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg><span>Settings</span></a>
+      </nav>
+      <div class="userchip"><div class="av">LN</div><div><b style="font-size:13px">Lemashon N.</b><small>Nakuru kiosk</small></div></div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="topbar">
+      <div class="crumb">Farm Pal / <b id="crumb">Home</b></div>
+      <div class="search"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><input placeholder="Search farmers, crops, diseases" /></div>
+      <div class="langtog"><button class="on" data-l="en">EN</button><button data-l="sw">SW</button></div>
+      <button class="cta" data-go="ask"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>New question</button>
+    </div>
+
+    <!-- HOME -->
+    <section class="page" data-p="home">
+      <p class="eyebrow">The offline farming advisor</p>
+      <div class="hero">
+        <div class="hero-card">
+          <h1 class="disp">Know sooner.<br>Grow <em>surer.</em></h1>
+          <p class="sub">Ask in English or Kiswahili, or photograph a sick leaf. Farm Pal answers from real Kenyan sources, offline, and shows its work.</p>
+          <div class="hero-actions">
+            <button class="btn" data-go="ask"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Ask a question</button>
+            <button class="btn ghost" data-go="diagnose"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>Diagnose a leaf</button>
+          </div>
+        </div>
+        <div class="hero-visual">
+          <div class="leaf-badge"><div class="k">Grounded run</div><div class="v"><span class="pass">3 sources</span> · verified</div></div>
+          <div class="leafart">
+            <svg viewBox="0 0 120 120" fill="none"><path d="M60 108C30 96 18 70 24 44 34 8 78 20 100 8c6 24 8 52-10 74-12 15-20 20-30 26Z" fill="#8FB86A"/><path d="M60 104C46 74 40 44 60 16" stroke="#3B6D11" stroke-width="2.5" stroke-linecap="round"/><path d="M52 62c-8-3-14-9-18-16M66 46c8-4 13-10 16-18M56 82c-6-3-11-8-14-14" stroke="#3B6D11" stroke-width="2" stroke-linecap="round"/><circle cx="46" cy="70" r="4" fill="#C56A3E"/><circle cx="72" cy="52" r="3" fill="#C56A3E"/></svg>
+          </div>
+          <div style="font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft)">Maize · beans · fully offline</div>
+        </div>
+      </div>
+
+      <div class="stats" id="stats">
+        <div class="stat"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div><div class="k">Farmers tracked</div><div class="n" data-count="128">0</div><div class="d">+12 this week</div></div>
+        <div class="stat"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="13" r="4"/><path d="M5 6h14l-1-3H6z"/></svg></div><div class="k">Diagnoses</div><div class="n" data-count="342">0</div><div class="d">95.8% model acc.</div></div>
+        <div class="stat"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2 2 7l10 5 10-5z"/><path d="m2 17 10 5 10-5M2 12l10 5 10-5"/></svg></div><div class="k">Crops monitored</div><div class="n" data-count="216">0</div><div class="d">maize + beans</div></div>
+        <div class="stat"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m22 4-10 10-3-3"/></svg></div><div class="k">Grounded answers</div><div class="n" data-count="97">0</div><div class="d">with citations</div></div>
+      </div>
+
+      <div class="grid2">
+        <div class="panelcard">
+          <h3>Recent activity</h3>
+          <p class="meta">Diagnoses and advice given at this kiosk</p>
+          <div class="feed" id="feed"></div>
+        </div>
+        <div class="panelcard">
+          <h3>Needs attention</h3>
+          <p class="meta">Crops flagged with a disease</p>
+          <div class="feed" id="attn"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ASK -->
+    <section class="page hide" data-p="ask">
+      <p class="eyebrow">Ask Farm Pal</p>
+      <h1 class="disp">What's troubling your crop?</h1>
+      <p class="sub">Type a question in English or Kiswahili. Every answer is drawn from local reference material and cites its sources.</p>
+      <div class="ask-wrap">
+        <div class="composer">
+          <textarea id="q" placeholder="e.g. How do I control stem borer in my maize without expensive pesticides?"></textarea>
+          <div class="bar">
+            <button class="chip" data-fill="How do I control stem borer in my maize without expensive pesticides?"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 2 7l10 5 10-5z"/></svg>Stem borer</button>
+            <button class="chip" data-fill="How do I control rust on my beans?"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg>Bean rust</button>
+            <button class="chip" data-fill="How do I manage armyworm attacking my maize?"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 2v4M16 2v4M3 10h18"/></svg>Armyworm</button>
+            <button class="btn" style="margin-left:auto" id="askbtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M22 2 11 13M22 2l-7 20-4-9-9-4z"/></svg>Ask</button>
+          </div>
+        </div>
+        <div class="answer" id="ans">
+          <div class="head"><span class="badge b-high">High confidence</span><span class="t">Grounded advice</span></div>
+          <div class="body" id="ansbody"></div>
+          <div class="sources">
+            <div class="lab">Based on</div>
+            <div class="src"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>African Maize stalkborer.txt <span class="sc">0.71</span></div>
+            <div class="src"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>Maize Revised Infonet.txt <span class="sc">0.66</span></div>
+            <div class="src"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>MAIZE_TIMPS_Volume-1.pdf <span class="sc">0.63</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DIAGNOSE -->
+    <section class="page hide" data-p="diagnose">
+      <p class="eyebrow">Photo diagnosis</p>
+      <h1 class="disp">Show me the leaf.</h1>
+      <p class="sub">Upload a photo of an affected leaf. The vision model names the crop and disease, then pulls the matching guidance.</p>
+      <div class="diag">
+        <div>
+          <div class="drop" id="drop">
+            <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5M12 3v12"/></svg></div>
+            <b>Drop a leaf photo</b>
+            <p>or tap to use the kiosk camera</p>
+          </div>
+          <button class="btn" style="width:100%;margin-top:14px;justify-content:center" id="analyze"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>Analyze photo</button>
+        </div>
+        <div class="dx" id="dx" style="opacity:.4">
+          <div class="leafthumb"><svg viewBox="0 0 120 120" fill="none"><path d="M60 108C30 96 18 70 24 44 34 8 78 20 100 8c6 24 8 52-10 74-12 15-20 20-30 26Z" fill="#B7CB8E"/><path d="M60 104C46 74 40 44 60 16" stroke="#3B6D11" stroke-width="2.5"/><circle cx="46" cy="70" r="5" fill="#C56A3E"/><circle cx="70" cy="54" r="4" fill="#C56A3E"/><circle cx="58" cy="84" r="3.5" fill="#C56A3E"/></svg></div>
+          <div class="top"><span class="big">Awaiting photo</span></div>
+          <div class="rows">
+            <div class="r"><span class="k">Crop</span><span>—</span></div>
+            <div class="r"><span class="k">Condition</span><span>—</span></div>
+            <div class="r"><span class="k">Confidence</span><div class="conf-meter"><i id="cbar"></i></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FARMERS -->
+    <section class="page hide" data-p="farmers">
+      <p class="eyebrow">Farmer profiles</p>
+      <h1 class="disp">The farmers you serve.</h1>
+      <p class="sub">Each profile keeps a farmer's crops, growth stages, diagnoses, and the next action to take.</p>
+      <div class="farmgrid" id="farmgrid"></div>
+    </section>
+
+    <!-- PROFILE / CROP HISTORY -->
+    <section class="page hide" data-p="profile">
+      <button class="backlink" data-go="farmers"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>All farmers</button>
+      <div id="profbody"></div>
+    </section>
+
+    <!-- CROP HISTORY (all) -->
+    <section class="page hide" data-p="history">
+      <p class="eyebrow">Crop history</p>
+      <h1 class="disp">Every crop, every stage.</h1>
+      <p class="sub">A running record across all farmers: crop, growth stage, disease found, and the guidance given.</p>
+      <div id="allhistory"></div>
+    </section>
+
+    <!-- SOURCES -->
+    <section class="page hide" data-p="sources">
+      <p class="eyebrow">Reference corpus</p>
+      <h1 class="disp">Where answers come from.</h1>
+      <p class="sub">Farm Pal only answers from these local Kenyan documents. Nothing is invented.</p>
+      <div class="doclist" id="doclist"></div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section class="page hide" data-p="settings">
+      <p class="eyebrow">Settings</p>
+      <h1 class="disp">Kiosk settings.</h1>
+      <p class="sub">This is a design preview. In the live kiosk these control language, model, and sync.</p>
+      <div class="panelcard" style="max-width:520px">
+        <div class="feed">
+          <div class="row"><div class="av" style="background:var(--green)">EN</div><div><b>Default language</b><span>English · Kiswahili available</span></div><span class="when">EN/SW</span></div>
+          <div class="row"><div class="av" style="background:var(--clay)">AI</div><div><b>Model</b><span>Llama 3.2 1B · offline</span></div><span class="when">1.4 GB</span></div>
+          <div class="row"><div class="av" style="background:var(--leaf)">DB</div><div><b>Corpus</b><span>1,553 chunks · KALRO, Infonet</span></div><span class="when">local</span></div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+(function(){
+  var farmers=[
+    {id:'f1',name:'Wanjiru Kamau',county:'Nakuru',color:'#254A34',crops:[
+      {crop:'Beans',stage:'Flowering',disease:'Bean Rust',cls:'b-rust',warn:true,date:'12 Aug 2026',
+       next:'Remove infected lower leaves and keep 45–50 cm row spacing for airflow. Scout at flowering; use a copper or mancozeb spray only if pustules spread.'},
+      {crop:'Maize',stage:'Whorl',disease:'Healthy',cls:'b-healthy',warn:false,date:'3 Aug 2026',
+       next:'No disease seen. Keep monitoring the whorl for stem borer windowpane holes.'}
+    ]},
+    {id:'f2',name:'Otieno Ochieng',county:'Kisumu',color:'#2F5C41',crops:[
+      {crop:'Maize',stage:'Whorl',disease:'Stem Borer',cls:'b-borer',warn:true,date:'15 Aug 2026',
+       next:'Destroy old crop residues and try push-pull with Napier and Desmodium. A pinch of dry soil or ash in the funnel helps young plants without costly sprays.'}
+    ]},
+    {id:'f3',name:'Njeri Mwangi',county:'Kiambu',color:'#6E4A2C',crops:[
+      {crop:'Beans',stage:'Pod fill',disease:'Angular Leaf Spot',cls:'b-als',warn:true,date:'9 Aug 2026',
+       next:'Use certified clean seed next season and avoid walking through the crop when wet. Rotate with maize for two seasons to clear the fungus from debris.'},
+      {crop:'Maize',stage:'Ripe for harvest',disease:'Gray Leaf Spot',cls:'b-gray',warn:false,date:'28 Jul 2026',
+       next:'Late in the season; harvest on time and bury infected residue to protect next season.'}
+    ]},
+    {id:'f4',name:'Amina Hassan',county:'Machakos',color:'#8a5f14',crops:[
+      {crop:'Maize',stage:'Germinating',disease:'Healthy',cls:'b-healthy',warn:false,date:'18 Aug 2026',
+       next:'Seedlings look healthy. Plant early and thin to recommended spacing to reduce pest pressure.'}
+    ]}
+  ];
+
+  var stageBadge={ 'Germinating':'b-stage','Whorl':'b-stage','Flowering':'b-stage','Pod fill':'b-stage','Ripe for harvest':'b-stage' };
+
+  function initials(n){return n.split(' ').map(function(w){return w[0]}).join('').slice(0,2).toUpperCase();}
+
+  // ---- Routing ----
+  var titles={home:'Home',ask:'Ask',diagnose:'Diagnose',farmers:'Farmers',profile:'Farmer profile',history:'Crop history',sources:'Sources',settings:'Settings'};
+  function go(page){
+    document.querySelectorAll('.page').forEach(function(p){p.classList.toggle('hide',p.dataset.p!==page);});
+    document.querySelectorAll('#nav a, .side-foot .nav a').forEach(function(a){a.classList.toggle('active',a.dataset.page===page);});
+    document.getElementById('crumb').textContent=titles[page]||'Home';
+    var el=document.querySelector('.page[data-p="'+page+'"]');
+    if(el){el.style.animation='none';el.offsetHeight;el.style.animation='';}
+    if(page==='home')animateCounts();
+    document.querySelector('.main').scrollTo({top:0,behavior:'smooth'});
+  }
+  document.querySelectorAll('[data-page]').forEach(function(a){a.addEventListener('click',function(){go(a.dataset.page);});});
+  document.querySelectorAll('[data-go]').forEach(function(b){b.addEventListener('click',function(){go(b.dataset.go);});});
+
+  // ---- Counters ----
+  function animateCounts(){
+    document.querySelectorAll('#stats .n').forEach(function(el){
+      var target=+el.dataset.count,start=0,t0=performance.now();
+      function step(now){var p=Math.min(1,(now-t0)/900);el.textContent=Math.round(target*(1-Math.pow(1-p,3)));if(p<1)requestAnimationFrame(step);}
+      requestAnimationFrame(step);
+    });
+  }
+
+  // ---- Home feed ----
+  var feed=document.getElementById('feed');
+  var acts=[
+    {n:'Otieno Ochieng',c:'#2F5C41',t:'Maize · stem borer diagnosed',w:'2m'},
+    {n:'Wanjiru Kamau',c:'#254A34',t:'Beans · bean rust advice given',w:'18m'},
+    {n:'Njeri Mwangi',c:'#6E4A2C',t:'Beans · angular leaf spot flagged',w:'1h'},
+    {n:'Amina Hassan',c:'#8a5f14',t:'Maize · healthy at germination',w:'3h'}
+  ];
+  feed.innerHTML=acts.map(function(a){return '<div class="row"><div class="av" style="background:'+a.c+'">'+initials(a.n)+'</div><div><b>'+a.n+'</b><br><span>'+a.t+'</span></div><span class="when">'+a.w+'</span></div>';}).join('');
+
+  var attn=document.getElementById('attn');
+  var flags=[];
+  farmers.forEach(function(f){f.crops.forEach(function(c){if(c.warn)flags.push({f:f,c:c});});});
+  attn.innerHTML=flags.map(function(x){return '<div class="row"><div class="av" style="background:'+x.f.color+'">'+initials(x.f.name)+'</div><div><b>'+x.c.crop+' · '+x.f.name.split(' ')[0]+'</b><br><span>'+x.f.county+'</span></div><span class="badge '+x.c.cls+'">'+x.c.disease+'</span></div>';}).join('');
+
+  // ---- Farmers grid ----
+  var fg=document.getElementById('farmgrid');
+  fg.innerHTML=farmers.map(function(f){
+    var alerts=f.crops.filter(function(c){return c.warn;}).length;
+    var chips=f.crops.map(function(c){return '<span class="badge '+c.cls+'">'+c.crop+' · '+c.disease+'</span>';}).join('');
+    return '<div class="farm" data-f="'+f.id+'"><div class="h"><div class="av" style="background:'+f.color+'">'+initials(f.name)+'</div><div><b>'+f.name+'</b><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>'+f.county+' County</span></div></div><div class="cropline">'+chips+'</div><div class="foot"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 2 7l10 5 10-5z"/></svg>'+f.crops.length+' crops tracked'+(alerts?'<span class="alert"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg>'+alerts+' to act on</span>':'')+'</div></div>';
+  }).join('');
+  fg.querySelectorAll('.farm').forEach(function(el){el.addEventListener('click',function(){openProfile(el.dataset.f);});});
+
+  // ---- Profile ----
+  function entryHTML(c){
+    return '<div class="entry'+(c.warn?' warn':'')+'"><div class="eh"><b>'+c.crop+'</b><span class="badge '+stageBadge[c.stage]+'">'+c.stage+'</span><span class="badge '+c.cls+'">'+c.disease+'</span><span class="date">'+c.date+'</span></div>'+
+      '<div class="kv"><div class="c"><div class="k">Crop</div><div class="v">'+c.crop+'</div></div><div class="c"><div class="k">Growth stage</div><div class="v">'+c.stage+'</div></div><div class="c"><div class="k">Diagnosis</div><div class="v">'+c.disease+'</div></div></div>'+
+      '<div class="next'+(c.warn?' warn':'')+'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><div><b>Next action:</b> '+c.next+'</div></div></div>';
+  }
+  function openProfile(id){
+    var f=farmers.filter(function(x){return x.id===id;})[0];if(!f)return;
+    var alerts=f.crops.filter(function(c){return c.warn;}).length;
+    var html='<div class="profhead"><div class="av" style="background:'+f.color+'">'+initials(f.name)+'</div>'+
+      '<div><h2>'+f.name+'</h2><div class="m"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>'+f.county+' County</span><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg>+254 7•• ••• •••</span></div></div>'+
+      '<div class="profstats"><div><div class="n">'+f.crops.length+'</div><div class="k">Crops</div></div><div><div class="n" style="color:'+(alerts?'#C56A3E':'#5C8A3A')+'">'+alerts+'</div><div class="k">To act on</div></div></div></div>'+
+      '<div class="timeline">'+f.crops.map(entryHTML).join('')+'</div>'+
+      '<button class="addbtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>Add crop record</button>';
+    document.getElementById('profbody').innerHTML=html;
+    go('profile');
+  }
+
+  // ---- All history ----
+  var all=[];
+  farmers.forEach(function(f){f.crops.forEach(function(c){all.push({f:f,c:c});});});
+  document.getElementById('allhistory').innerHTML='<div class="timeline">'+all.map(function(x){
+    var c=x.c;
+    return '<div class="entry'+(c.warn?' warn':'')+'"><div class="eh"><b>'+x.f.name.split(' ')[0]+' · '+c.crop+'</b><span class="badge '+stageBadge[c.stage]+'">'+c.stage+'</span><span class="badge '+c.cls+'">'+c.disease+'</span><span class="date">'+c.date+'</span></div><div class="next'+(c.warn?' warn':'')+'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><div><b>Next action:</b> '+c.next+'</div></div></div>';
+  }).join('')+'</div>';
+
+  // ---- Sources ----
+  var docs=[['KALRO manuals','Crop management'],['Infonet-Biovision','Pests & diseases'],['Bean Rust.txt','Beans · rust'],['Angular Leaf Spot.txt','Beans · ALS'],['African Maize stalkborer.txt','Maize · stem borer'],['MAIZE_TIMPS Vol.1','Maize technical'],['AFA crop strategies','Value chains'],['KAMIS market data','Prices']];
+  document.getElementById('doclist').innerHTML=docs.map(function(d){return '<div class="doc"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></div><div><b>'+d[0]+'</b><br><span>'+d[1]+'</span></div></div>';}).join('');
+
+  // ---- Ask (mock typewriter) ----
+  var answerText="Stem borer is one of the most damaging maize pests, but you can hold it back without costly sprays. First, destroy or plough in the old maize stalks after harvest, since the caterpillars overwinter inside them. Plant early and keep your field weed-free so young plants grow past the vulnerable whorl stage quickly. A push-pull system works well: plant Napier grass around the field to draw the moths away and Desmodium between rows to repel them. For young plants already showing windowpane holes, a small pinch of dry soil or wood ash dropped into the funnel smothers the larvae. Scout weekly and only consider a targeted spray if damage keeps climbing.";
+  var q=document.getElementById('q');
+  document.querySelectorAll('[data-fill]').forEach(function(b){b.addEventListener('click',function(){q.value=b.dataset.fill;q.focus();});});
+  document.getElementById('askbtn').addEventListener('click',function(){
+    if(!q.value.trim()){q.value="How do I control stem borer in my maize without expensive pesticides?";}
+    var ans=document.getElementById('ans'),body=document.getElementById('ansbody');
+    ans.classList.remove('show');body.innerHTML='';
+    setTimeout(function(){
+      ans.classList.add('show');ans.scrollIntoView({behavior:'smooth',block:'nearest'});
+      var i=0;body.innerHTML='<p></p>';var p=body.querySelector('p');
+      var timer=setInterval(function(){
+        p.textContent=answerText.slice(0,i);i+=3;
+        if(i>answerText.length){clearInterval(timer);p.textContent=answerText;
+          body.insertAdjacentHTML('beforeend','<div class="caveat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg><div>Confirm with a local extension officer before using any product.</div></div>');
+        }
+      },14);
+    },120);
+  });
+
+  // ---- Diagnose (mock analyze) ----
+  document.getElementById('analyze').addEventListener('click',function(){
+    var dx=document.getElementById('dx');dx.style.opacity='1';
+    dx.querySelector('.top').innerHTML='<span class="badge b-high">High confidence</span><span class="big">Maize — Common Rust</span>';
+    dx.querySelector('.rows').innerHTML='<div class="r"><span class="k">Crop</span><span style="font-weight:600">Maize</span></div>'+
+      '<div class="r"><span class="k">Condition</span><span class="badge b-borer">Common Rust</span></div>'+
+      '<div class="r"><span class="k">Also possible</span><span style="color:var(--ink-soft)">Northern Leaf Blight, Gray Leaf Spot</span></div>'+
+      '<div class="r"><span class="k">Confidence</span><div class="conf-meter"><i id="cbar"></i></div></div>';
+    if(!dx.querySelector('.nextbox')){
+      dx.insertAdjacentHTML('beforeend','<div class="nextbox"><div class="k">Next action · grounded</div><p>Remove and burn heavily rusted leaves, avoid overhead watering late in the day, and plant rust-tolerant varieties next season. Apply a mancozeb-based fungicide only if pustules spread across the upper leaves.</p></div>');
+    }
+    setTimeout(function(){var b=document.getElementById('cbar');if(b)b.style.width='88%';},60);
+  });
+
+  // ---- Language toggle (visual) ----
+  document.querySelectorAll('.langtog button').forEach(function(b){b.addEventListener('click',function(){document.querySelectorAll('.langtog button').forEach(function(x){x.classList.remove('on');});b.classList.add('on');});});
+
+  animateCounts();
+})();
+</script>
+</body>
+</html>

@@ -1,4 +1,4 @@
-# Shamba Rafiki
+# Farm Pal
 
 An offline agricultural advisory tool for smallholder maize and bean farmers in
 Kenya. It runs on a modest 8 GB laptop with no internet at question time. A

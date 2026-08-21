@@ -3,7 +3,7 @@ name = "shamba-rafiki-backend"
 version = "0.1.0"
 description = "Offline AI agricultural advisory assistant for smallholder farmers."
 authors = [
-    { name = "Shamba Rafiki Team" }
+    { name = "Farm Pal Team" }
 ]
 readme = "README.md"
 requires-python = ">=3.12"

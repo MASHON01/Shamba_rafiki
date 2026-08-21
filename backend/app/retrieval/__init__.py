@@ -1,7 +1,7 @@
 """
 Retrieval engine.
 
-The RAG indexing and retrieval half of Shamba Rafiki. Reads the
+The RAG indexing and retrieval half of Farm Pal. Reads the
 corpus manifest produced by `app.ingestion`, embeds each chunk, and
 builds a searchable vector index:
 

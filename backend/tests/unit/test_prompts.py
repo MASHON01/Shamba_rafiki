@@ -30,7 +30,7 @@ def _result(text, score, **meta):
 
 def test_system_prompt_english_diagnosis():
     p = get_system_prompt(LanguageCode.ENGLISH, "diagnosis")
-    assert "Shamba Rafiki" in p and "numbered steps" in p
+    assert "Farm Pal" in p and "numbered steps" in p
 
 
 def test_system_prompt_swahili():
@@ -81,7 +81,7 @@ def test_prompt_assembles_all_parts():
     bp = PromptBuilder().build(
         question="How do I treat maize blight?", context=ctx,
         language=LanguageCode.ENGLISH, intent="diagnosis")
-    assert "Shamba Rafiki" in bp.system_prompt
+    assert "Farm Pal" in bp.system_prompt
     assert "Maize blight: use fungicide." in bp.user_prompt
     assert "How do I treat maize blight?" in bp.user_prompt
     assert bp.full_prompt.rstrip().endswith("Answer:")

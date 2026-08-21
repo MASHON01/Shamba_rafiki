@@ -34,7 +34,7 @@ def root() -> dict:
             "status": "running",
             "environment": settings.APP_ENV,
         },
-        message="Shamba Rafiki backend is running.",
+        message="Farm Pal backend is running.",
     )
 
 

@@ -30,7 +30,7 @@ from app.retrieval import Indexer  # noqa: E402
 
 def _parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Build the Shamba Rafiki vector index from the "
+        description="Build the Farm Pal vector index from the "
         "processed corpus."
     )
     parser.add_argument(

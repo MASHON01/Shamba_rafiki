@@ -1,5 +1,5 @@
 """
-Shared type definitions used throughout Shamba Rafiki.
+Shared type definitions used throughout Farm Pal.
 
 This module centralizes reusable type aliases to improve
 readability, consistency, and maintainability across the
