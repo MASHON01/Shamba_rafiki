@@ -372,10 +372,10 @@ NO_CONTEXT_PLACEHOLDER = "No specific reference material was found for this ques
 # LLM generation (Output 6)
 # ---------------------------------------------------------------------------
 
-LLM_MAX_TOKENS = 512
+LLM_MAX_TOKENS = 384
 """Max tokens the model may generate per answer. Farmer answers are
-short and actionable; capping generation keeps latency (the speed
-score) and memory bounded on the 8GB target machine."""
+short and actionable, so a tighter cap both bounds latency and gives the
+small model less room to wander into rambling or repetition."""
 
 LLM_TEMPERATURE = 0.3
 """Low temperature: advisory answers should be consistent and
@@ -389,9 +389,12 @@ LLM_TIMEOUT_SECONDS = 120
 of a few hundred tokens on the target machine can be slow, so this
 is generous; a hung server surfaces as a typed error, not a freeze."""
 
-LLM_STOP_SEQUENCES = ["\nQuestion:", "\nReference material:"]
-"""Stop generation if the model tries to hallucinate a new Q/A turn
-or a new reference block - keeps the answer to just the answer."""
+LLM_STOP_SEQUENCES = ["\nQuestion:", "\nReference material:", "\nAnswer:"]
+"""Stop generation if the model tries to hallucinate a new Q/A turn,
+re-answer on a new line, or open a new reference block - keeps the answer
+to just the answer. "\nAnswer:" catches the small model restarting its
+reply (a whole-answer duplication the token-level repeat penalty can't
+see, since the repeat is farther apart than the penalty window)."""
 
 # ---------------------------------------------------------------------------
 # Conversation memory (Output 6)
