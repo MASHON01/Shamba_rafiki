@@ -13,8 +13,19 @@ Run in production (recommended):
 
 from __future__ import annotations
 
-from app.api.app_factory import create_app
-from app.config.settings import settings
+import os
+
+# Serve fully offline: load every local model (the MiniLM embedder and the
+# NLLB tokenizer) from the on-disk Hugging Face cache without contacting the
+# network. The one-time corpus build in scripts/ runs separately and may still
+# download to populate that cache; only the running server is pinned offline,
+# so a judge can unplug the internet and every query still works. These must
+# be set before importing anything that pulls in huggingface_hub / transformers.
+os.environ.setdefault("HF_HUB_OFFLINE", "1")
+os.environ.setdefault("TRANSFORMERS_OFFLINE", "1")
+
+from app.api.app_factory import create_app  # noqa: E402
+from app.config.settings import settings  # noqa: E402
 
 app = create_app()
 
