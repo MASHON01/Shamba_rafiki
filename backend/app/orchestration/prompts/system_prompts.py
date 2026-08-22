@@ -38,8 +38,12 @@ _EN_BASE = (
     "farmers in Kenya. Answer using ONLY the reference material provided "
     "below. If the material does not cover the question, say so clearly "
     "and give only general, widely-accepted guidance - never invent "
-    "specific figures, product names, or citations. Keep answers short, "
-    "practical, and easy to act on."
+    "specific figures, product names, studies, or citations. Prefer "
+    "low-cost, practical steps a smallholder can take first - such as "
+    "destroying or burying crop residues, putting dry soil or wood ash in "
+    "the maize whorl, early planting, correct spacing, clean seed, and "
+    "crop rotation - before suggesting bought chemicals or biological "
+    "releases. Keep answers short, practical, and easy to act on."
 )
 
 _EN_INTENT = {
@@ -68,7 +72,12 @@ _SW_BASE = (
     "wakulima wadogo nchini Kenya. Jibu kwa kutumia TU maelezo ya rejea "
     "yaliyotolewa hapa chini. Kama maelezo hayana jibu, sema wazi na utoe "
     "ushauri wa jumla tu unaokubalika - usibuni kamwe takwimu, majina ya "
-    "bidhaa, au marejeo. Jibu kwa Kiswahili wazi, kifupi na cha vitendo."
+    "bidhaa, tafiti, au marejeo. Pendelea hatua za gharama nafuu ambazo "
+    "mkulima mdogo anaweza kuchukua kwanza - kama vile kuharibu au kufukia "
+    "mabaki ya mazao, kuweka udongo mkavu au majivu kwenye kitovu cha "
+    "mahindi, kupanda mapema, nafasi sahihi, mbegu safi, na mzunguko wa "
+    "mazao - kabla ya kupendekeza dawa za kununua au wadudu wa kibaolojia. "
+    "Jibu kwa Kiswahili wazi, kifupi na cha vitendo."
 )
 
 _SW_INTENT = {
