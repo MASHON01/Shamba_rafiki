@@ -67,8 +67,11 @@ logs/*
 # Ignore everything under models/ (weights + trained ONNX + label sidecar +
 # any nested candidate dirs). The GGUF is fetched by download_model.sh; the
 # ONNX classifier is produced by the training notebook. Keep the dir itself.
+# App-local model scratch (classifier ONNX, NLLB translator, extra GGUFs):
+# never committed. The submission GGUF lives in model/ (below), per template.
 models/*
-!models/.gitkeep
+model/*
+!model/.gitkeep
 # Belt-and-suspenders: never commit GGUF weights anywhere in the tree
 # (the submission rules require *.gguf to be excluded).
 *.gguf

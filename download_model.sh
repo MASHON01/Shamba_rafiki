@@ -2,7 +2,7 @@
 #
 # ADTC submission model downloader.
 #
-# Downloads the GGUF weight file to models/, matching `_runtime.model_path`
+# Downloads the GGUF weight file to model/, matching `_runtime.model_path`
 # in metadata.json. Idempotent (skips if already present) and requires no
 # credentials — the weights are hosted publicly on the Hugging Face Hub.
 #
@@ -11,7 +11,7 @@
 set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-MODEL_DIR="$REPO_ROOT/models"
+MODEL_DIR="$REPO_ROOT/model"
 MODEL_FILE="Llama-3.2-1B-Instruct-Q4_K_M.gguf"
 MODEL_PATH="$MODEL_DIR/$MODEL_FILE"
 

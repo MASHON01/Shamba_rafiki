@@ -59,7 +59,7 @@ pip install -r requirements.txt
 copy .env.example .env            # Windows (use: cp on Linux/Mac), then edit if needed
 
 # 4. Build llama.cpp and start the model server
-#    llama.cpp/build/bin/llama-server -m models/Llama-3.2-1B-Instruct-Q4_K_M.gguf \
+#    llama.cpp/build/bin/llama-server -m model/Llama-3.2-1B-Instruct-Q4_K_M.gguf \
 #        --host 127.0.0.1 --port 8080 -c 4096 -t 4
 
 # 5. Build the offline corpus and index (one time)

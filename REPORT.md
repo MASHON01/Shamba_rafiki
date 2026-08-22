@@ -193,7 +193,7 @@ rest.
 bash download_model.sh
 
 # 2. Build llama.cpp, then start the server
-#    ./llama.cpp/build/bin/llama-server -m models/Llama-3.2-1B-Instruct-Q4_K_M.gguf \
+#    ./llama.cpp/build/bin/llama-server -m model/Llama-3.2-1B-Instruct-Q4_K_M.gguf \
 #        --host 127.0.0.1 --port 8080 -c 4096 -t 4
 
 # 3. Build the offline corpus and index, then run the backend
