@@ -69,6 +69,9 @@ logs/*
 # ONNX classifier is produced by the training notebook. Keep the dir itself.
 models/*
 !models/.gitkeep
+# Belt-and-suspenders: never commit GGUF weights anywhere in the tree
+# (the submission rules require *.gguf to be excluded).
+*.gguf
 
 #################################################
 # llama.cpp  (built on the target machine by scripts/setup_local.sh;
